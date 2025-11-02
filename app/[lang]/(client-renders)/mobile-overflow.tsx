@@ -58,7 +58,7 @@ export default function MobileOverflow({ lang }: { lang: string }) {
       </DropdownMenu>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="dark:bg-neutral-800">
+        <DialogContent className="dark:bg-neutral-900">
           <DialogHeader>
             <DialogTitle>Appearance</DialogTitle>
             <DialogDescription className="mt-2">Choose a theme</DialogDescription>

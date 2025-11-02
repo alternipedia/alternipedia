@@ -26,7 +26,7 @@ export default function Terms({ text, lang }: { text?: string; lang: Locale }  )
       <DialogTrigger asChild>
         <a className="hover:underline text-blue-400 cursor-pointer">{text}</a>
       </DialogTrigger>
-      <DialogContent className="flex flex-col gap-0 p-0 sm:max-h-[min(640px,80vh)] sm:max-w-lg [&>button:last-child]:top-3.5">
+      <DialogContent className="flex flex-col gap-0 p-0 sm:max-h-[min(640px,80vh)] sm:max-w-lg [&>button:last-child]:top-3.5 dark:bg-neutral-900">
         <DialogHeader className="contents space-y-0 text-left">
           <DialogTitle className="border-b px-6 py-4 text-base">
             {dict.termsAndConditions}

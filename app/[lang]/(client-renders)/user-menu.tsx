@@ -63,7 +63,7 @@ export default function UserMenu({ lang }: { lang: Locale }) {
           <CircleUserRoundIcon size={16} aria-hidden="true" className="scale-120" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="max-w-64" collisionPadding={8}>
+      <DropdownMenuContent className="max-w-64 dark:!bg-neutral-800" collisionPadding={8}>
 
         {status === "loading" && (
           <DropdownMenuLabel className="flex items-center gap-3 text-ellipsis">
@@ -98,33 +98,33 @@ export default function UserMenu({ lang }: { lang: Locale }) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem className="cursor-pointer" onClick={() => router.push(`/${lang}/saved`)}>
+              <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700" onClick={() => router.push(`/${lang}/saved`)}>
                 <BookMarked size={16} className="opacity-60" aria-hidden="true" />
                 <span>{dict.userMenu.savedArticles}</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">
+              <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700">
                 <MessageSquarePlus size={16} className="opacity-60" aria-hidden="true" />
                 <span>{dict.userMenu.contributions}</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer" onClick={() => router.push(`/${lang}/settings`)}>
+              <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700" onClick={() => router.push(`/${lang}/settings`)}>
                 <Settings size={16} className="opacity-60" aria-hidden="true" />
                 <span>{dict.userMenu.preferences}</span>
               </DropdownMenuItem>
               {session.user.moderatedBias?.id && (
-                <DropdownMenuItem className="cursor-pointer" onClick={() => router.push(`/${lang}/settings`)}>
+                <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700" onClick={() => router.push(`/${lang}/settings`)}>
                   <Gavel size={16} className="opacity-60" aria-hidden="true" />
                   <span>Moderator panel</span>
                 </DropdownMenuItem>
               )}
               {(session.user.role === "ADMIN" || session.user.role === "GLOBAL_ADMIN") && (
-                <DropdownMenuItem className="cursor-pointer" onClick={() => router.push(`/${lang}/admin`)}>
+                <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700" onClick={() => router.push(`/${lang}/admin`)}>
                   <ShieldUser size={16} className="opacity-60" aria-hidden="true" />
                   <span>Admin panel</span>
                 </DropdownMenuItem>
               )}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer" onClick={() => signOut()}>
+            <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700" onClick={() => signOut()}>
               <LogOutIcon size={16} className="opacity-60" aria-hidden="true" />
               <span>{dict.userMenu.logout}</span>
             </DropdownMenuItem>
@@ -134,12 +134,12 @@ export default function UserMenu({ lang }: { lang: Locale }) {
           <DropdownMenuGroup>
             <Dialog>
               <DialogTrigger asChild>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer dark:hover:bg-neutral-700">
                   <KeyRound size={16} className="opacity-60" aria-hidden="true" />
                   <span>{dict.userMenu.login}</span>
                 </DropdownMenuItem>
               </DialogTrigger>
-              <DialogContent allowAutoFocus={false} className="dark:bg-neutral-800">
+              <DialogContent allowAutoFocus={false} className="dark:bg-neutral-900">
                 <div className="flex flex-col items-center gap-2">
                   <ScanFace size={52} />
                   <DialogHeader>

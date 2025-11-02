@@ -65,7 +65,7 @@ export default async function Pricing({ params }: { params: Promise<{ lang: stri
         {/* Pro Plan Card */}
         <div className="flex flex-col bg-defaultbgmain rounded-[10px] border-[none] before:content-[''] before:absolute before:inset-0 before:p-0.5 before:rounded-[10px] before:[background:linear-gradient(180deg,rgba(238,205,27,1)_0%,rgba(32,33,34,1)_100%)] before:[-webkit-mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[-webkit-mask-composite:xor] before:[mask-composite:exclude] before:z-[1] before:pointer-events-none relative overflow-hidden">
           <div className="bg-[#eecd1b] py-2 px-4 relative z-10">
-            <h3 className="text-center font-h3 text-defaulttextmain text-[length:var(--h3-font-size)] tracking-[var(--h3-letter-spacing)] leading-[var(--h3-line-height)] [font-style:var(--h3-font-style)] font-semibold">
+            <h3 className="text-center font-h3 text-defaulttextmain text-[length:var(--h3-font-size)] tracking-[var(--h3-letter-spacing)] leading-[var(--h3-line-height)] [font-style:var(--h3-font-style)] font-semibold dark:text-black">
               Alternipedia {dict.upgrade.pro}
             </h3>
           </div>

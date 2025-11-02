@@ -128,11 +128,11 @@ export default async function Layout({
                   <MenuIcon size={16} aria-hidden="true" className="scale-120" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent collisionPadding={8}>
-                <DropdownMenuItem className="cursor-pointer" asChild><Link href={`/${lang}`}>{dict.navigation.aboutUs}</Link></DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer" asChild><Link href={`/${lang}/news`}>{dict.navigation.currentEvents}</Link></DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer" asChild><Link href={`/${lang}/random`}>{dict.navigation.randomArticle}</Link></DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer" asChild><Link href={`/${lang}/help`}>{dict.navigation.help}</Link></DropdownMenuItem>
+              <DropdownMenuContent collisionPadding={8} className="dark:!bg-neutral-800">
+                <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700" asChild><Link href={`/${lang}`}>{dict.navigation.aboutUs}</Link></DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700" asChild><Link href={`/${lang}/news`}>{dict.navigation.currentEvents}</Link></DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700" asChild><Link href={`/${lang}/random`}>{dict.navigation.randomArticle}</Link></DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700" asChild><Link href={`/${lang}/help`}>{dict.navigation.help}</Link></DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -166,11 +166,11 @@ export default async function Layout({
                     <MenuIcon size={16} aria-hidden="true" className="scale-120" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent collisionPadding={8}>
-                  <DropdownMenuItem className="cursor-pointer" asChild><Link href={`/${lang}`}>{dict.navigation.aboutUs}</Link></DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer" asChild><Link href={`/${lang}/news`}>{dict.navigation.currentEvents}</Link></DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer" asChild><Link href={`/${lang}/random`}>{dict.navigation.randomArticle}</Link></DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer" asChild><Link href={`/${lang}/help`}>{dict.navigation.help}</Link></DropdownMenuItem>
+                <DropdownMenuContent collisionPadding={8} className="dark:!bg-neutral-800">
+                  <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700" asChild><Link href={`/${lang}`}>{dict.navigation.aboutUs}</Link></DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700" asChild><Link href={`/${lang}/news`}>{dict.navigation.currentEvents}</Link></DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700" asChild><Link href={`/${lang}/random`}>{dict.navigation.randomArticle}</Link></DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700" asChild><Link href={`/${lang}/help`}>{dict.navigation.help}</Link></DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -246,7 +246,7 @@ export default async function Layout({
                         {dict.footer.contact}
                       </div>
                     </DialogTrigger>
-                    <DialogContent allowAutoFocus={false}>
+                    <DialogContent allowAutoFocus={false} className="dark:bg-neutral-900">
                       <DialogHeader>
                         <DialogTitle>Send us feedback</DialogTitle>
                         <DialogDescription className="mt-2">
@@ -255,6 +255,7 @@ export default async function Layout({
                       </DialogHeader>
                       <Form action={onSubmitFeedback} className="space-y-5">
                         <Textarea
+                          className="dark:bg-neutral-800"
                           id="feedback"
                           name="feedback"
                           placeholder="How can we improve alternipedia?"
