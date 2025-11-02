@@ -114,7 +114,6 @@ model Subscription {
 
 model Account {
   id                String  @id @default(cuid())
-  userId            String
   type              String
   provider          String
   providerAccountId String
@@ -127,6 +126,7 @@ model Account {
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String
 
   @@unique([provider, providerAccountId])
 }

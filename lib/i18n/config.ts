@@ -51,6 +51,7 @@ export const locales = [
   'bs',    // Bosnian
   'cnr',   // Montenegrin
   'mt',    // Maltese
+  'hb',    // Hebrew
 ] as const;
 
 export type Locale = (typeof locales)[number];
@@ -109,6 +110,7 @@ export const localeNames: Record<Locale, string> = {
   bs: 'Bosanski',
   cnr: 'Crnogorski',
   mt: 'Malti',
+  hb: 'עברית',
 };
 
 export function isValidLocale(locale: string): locale is Locale {
