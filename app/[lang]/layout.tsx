@@ -152,6 +152,7 @@ export default async function Layout({
         <MobileOverflow lang={lang} />
       </div>
 
+      <div id="nav" className="w-full mx-auto px-4 sm:px-8 lg:px-16 xl:px-40 py-3.5 bg-white dark:bg-neutral-900 justify-between items-center hidden md:flex">
         <div className="w-full flex justify-between items-center">
           <div className="flex justify-start items-center gap-3 sm:gap-5 min-w-0 shrink-0">
             {/* Desktop/Tablet menu: hidden on small screens because we render a mobile header above */}
