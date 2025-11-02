@@ -44,6 +44,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   });
 
+  $('.hatnote').each((_, el) => {
+    $(el).css('background-color', 'transparent !important');
+  });
+
   $('img').each((_, el) => {
     const src = $(el).attr('src');
     if (src?.startsWith('/w/')) {
@@ -82,6 +86,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     $('#contentSub').remove();
   }
 
+  $('head').append(`
+    <script>
+window.addEventListener('message', (event) => {
+  // Optional: validate event.origin for security
+  const data = event.data || {};
+  if (data?.type === 'theme') {
+    const html = document.documentElement;
+    if (data.theme === 'dark') html.classList.add('skin-theme-clientpref-night');
+    else html.classList.remove('skin-theme-clientpref-night');
+  }
+}, false);
+
+// Optionally notify parent it's ready:
+window.parent.postMessage({ type: 'iframe-ready' }, '*');
+</script>
+    `);
+
   // Keep head for CSS/JS
   $('head').append(`
   <style>
@@ -91,11 +112,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       overflow-x: hidden !important;
       max-width: 100% !important;
       background: transparent !important;
-      color: inherit !important;
     }
+
+    html.skin-theme-clientpref-night {
+      color-scheme: normal !important;
+    }
+
     body {
       box-sizing: border-box;
     }
+
     img, table, pre {
       max-width: 100%;
       height: auto;
@@ -124,6 +150,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     window.addEventListener("load", setupObserver);
   </script>
+  <style>
+    
+  </style>
   `);
 
   const head = $('head').html();

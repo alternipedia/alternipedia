@@ -216,10 +216,10 @@ export default function ShortURL({ mobile }: { mobile: boolean }) {
               <a className="hover:underline cursor-pointer">
                 <div className="size- flex justify-start items-center gap-1.5">
                   <div data-svg-wrapper data-property-1="Short link" className="relative">
-                    <Link className="text-gray-500" size={16} />
+                    <Link className="text-gray-500 dark:text-neutral-400 " size={16} />
                   </div>
                   <div className="size- pr-1.5 flex justify-start items-center gap-2.5 overflow-hidden">
-                    <div className="justify-start text-gray-500 text-sm font-normal leading-normal truncate">{dict.tools.shortUrl}</div>
+                    <div className="justify-start text-gray-500 dark:text-neutral-400  text-sm font-normal leading-normal truncate">{dict.tools.shortUrl}</div>
                   </div>
                 </div>
               </a>

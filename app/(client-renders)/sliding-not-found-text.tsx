@@ -31,8 +31,8 @@ export default function SlidingNotFoundText() {
       setTimeout(() => {
         setCurrentIndex((prev) => (prev + 1) % notFoundMessages.length);
         setIsAnimating(false);
-      }, 300); // Half of the animation duration
-    }, 4000); // Change every 2.5 seconds
+      }, 150); // Half of the animation duration
+    }, 3250); // Change every 3.25 seconds
 
     return () => clearInterval(interval);
   }, []);
@@ -45,13 +45,13 @@ export default function SlidingNotFoundText() {
         isAnimating ? '-translate-y-5 opacity-0' : 'translate-y-0 opacity-100'
       }`}
     >
-      <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+      <h2 className="text-2xl font-semibold text-gray-700 dark:text-neutral-300 mb-4">
         {currentMessage.heading}
       </h2>
-      <p className="text-gray-600 mb-8 max-w-md">
+      <p className="text-gray-600 dark:text-neutral-400 mb-8 max-w-md">
         {currentMessage.message}
       </p>
-      <div className="text-xs text-gray-400 mt-2">
+      <div className="text-xs text-gray-400 dark:text-neutral-400 mt-2">
         {currentMessage.locale}
       </div>
     </div>

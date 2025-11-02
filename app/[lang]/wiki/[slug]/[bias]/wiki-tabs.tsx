@@ -173,25 +173,59 @@ export default function WikiTabs({ bias, slug, lang, revision = null, wikipediaD
   }, [bias, slug, lang, isTalkTab, mode]);
 
   useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      // if (event.origin !== new URL(`/api/wiki-proxy?slug=${slug}&lang=${lang}`).origin) return;
-      if (event.data.type === "wiki-height") {
-        setHeight(event.data.height + "px");
+    const sendThemeToIframe = (iframe: HTMLIFrameElement | null) => {
+      if (!iframe) return;
+      try {
+        // Read theme cookie named 'theme'. If absent default to 'light'.
+        const m = document.cookie.match(/(?:^|; )theme=([^;]+)/);
+        const theme = m ? decodeURIComponent(m[1]) : 'light';
+        const origin = window.location.origin;
+        iframe.contentWindow?.postMessage({ type: 'theme', theme }, origin);
+      } catch (e) {
+        // ignore
       }
     };
+
+    const handleMessage = (event: MessageEvent) => {
+      // wiki-height messages come from the iframe and contain the height
+      if (event.data?.type === "wiki-height") {
+        setHeight(event.data.height + "px");
+        return;
+      }
+
+      // The iframe posts { type: 'iframe-ready' } when its listener is attached.
+      if (event.data?.type === 'iframe-ready' && iframeRef.current && event.source === iframeRef.current.contentWindow) {
+        // send current theme to the iframe
+        sendThemeToIframe(iframeRef.current);
+        return;
+      }
+    };
+
     window.addEventListener("message", handleMessage);
+
+    // Also send theme once on mount in case the iframe is already ready/loaded
+    sendThemeToIframe(iframeRef.current);
+
     return () => window.removeEventListener("message", handleMessage);
   }, [isWikipedia, slug, lang]);
 
+  // When iframe load state changes to loaded, push theme as a fallback
+  useEffect(() => {
+    if (!iframeRef.current) return;
+    if (!loaded) return;
+    try {
+      const iframe = iframeRef.current;
+      const m = document.cookie.match(/(?:^|; )theme=([^;]+)/);
+      const theme = m ? decodeURIComponent(m[1]) : 'light';
+      const origin = window.location.origin;
+      iframe.contentWindow?.postMessage({ type: 'theme', theme }, origin);
+    } catch (e) {
+      // ignore
+    }
+  }, [loaded]);
+
   return (
     <div className={`relative w-full mb-6 ${isWikipedia ? '' : 'wikipedia-article'}`}>
-      {isWikipedia && (
-        <>
-          {/* Server-side overlay: shown immediately on page load for wikipedia bias
-          Removed by client JS when the article is ready. This guarantees a
-          spinner is visible on refresh/navigation before client hydration. */}
-        </>
-      )}
       {mounted ? (
         <Tabs onValueChange={handleOuterTabChange} defaultValue={getDefaultOuterTab(isTalkTab)} suppressHydrationWarning={true} id="wiki-tabs">
           {/* If the URL explicitly requested a numeric revision (e.g. ?revision=123),
@@ -230,7 +264,7 @@ export default function WikiTabs({ bias, slug, lang, revision = null, wikipediaD
             {/* Title on the left */}
             <div
               data-article-title
-              className={`text-neutral-800 text-3xl font-normal pb-2 truncate`}
+              className={`text-neutral-800 dark:text-neutral-300 text-3xl font-normal pb-2 truncate`}
             >
               {wikipediaData?.title ? String(wikipediaData.title) : revision?.title ? String(revision.title) : decodeURIComponent(slug.replaceAll('_', ' '))}
             </div>
@@ -239,14 +273,14 @@ export default function WikiTabs({ bias, slug, lang, revision = null, wikipediaD
             <TabsList className="relative h-auto w-auto gap-0.5 bg-transparent p-0">
               <TabsTrigger
                 value="tab-1"
-                className="overflow-hidden rounded-b-none data-[state=active]:border-x data-[state=active]:border-t py-2 data-[state=active]:z-10 data-[state=active]:shadow-none data-[state=active]:border-b data-[state=active]:border-b-background data-[state=active]:-mb-px data-[state=inactive]:cursor-pointer"
+                className="overflow-hidden rounded-b-none data-[state=active]:border-x data-[state=active]:border-t py-2 data-[state=active]:z-10 data-[state=active]:shadow-none data-[state=active]:border-b data-[state=active]:border-b-background data-[state=active]:-mb-px data-[state=inactive]:cursor-pointer dark:data-[state=active]:bg-neutral-900 dark:data-[state=active]:border-b-neutral-900"
               >
                 <ArticleText />
               </TabsTrigger>
               <TabsTrigger
                 value="tab-2"
                 disabled={isWikipedia}
-                className={`overflow-hidden rounded-b-none data-[state=active]:border-x data-[state=active]:border-t py-2 data-[state=active]:z-10 data-[state=active]:shadow-none data-[state=active]:border-b data-[state=active]:border-b-background data-[state=active]:-mb-px ${isWikipedia ? 'cursor-not-allowed pointer-events-auto!' : 'data-[state=inactive]:cursor-pointer'}`}
+                className={`overflow-hidden rounded-b-none data-[state=active]:border-x data-[state=active]:border-t py-2 data-[state=active]:z-10 data-[state=active]:shadow-none data-[state=active]:border-b data-[state=active]:border-b-background data-[state=active]:-mb-px dark:data-[state=active]:bg-neutral-900 dark:data-[state=active]:border-b-neutral-900 ${isWikipedia ? 'cursor-not-allowed pointer-events-auto!' : 'data-[state=inactive]:cursor-pointer'}`}
               >
                 <DiscussionText />
               </TabsTrigger>

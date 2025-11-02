@@ -137,7 +137,7 @@ function HelpLayoutContent({ children }: { children: React.ReactNode }) {
   const currentIndex = Math.max(pagesOrder.indexOf(activePage), 0);
 
   return (
-    <div className="container mx-auto flex w-full">
+    <div className="container mx-auto flex w-full dark:bg-neutral-900 py-8">
       <div className="h-full w-full flex flex-col text-center mx-20">
         <h1 className="text-4xl font-bold mb-6">Help & Support</h1>
 

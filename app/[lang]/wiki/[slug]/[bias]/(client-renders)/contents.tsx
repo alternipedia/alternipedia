@@ -76,7 +76,7 @@ function HeadingItem({ heading, active, index, containerRef }: { heading: Headin
         data-toc-index={index}
         onClick={handleClick}
         // TODO: highlight active section
-        className={`text-left text-sm text-gray-700 hover:text-blue-600 hover:underline cursor-pointer text-ellipsis ${active ? 'font-semibold' : ''}`}
+        className={`text-left text-sm text-gray-700 dark:text-neutral-400  hover:text-blue-600 hover:underline cursor-pointer text-ellipsis ${active ? 'font-semibold' : ''}`}
         // className={`text-left text-sm text-gray-700 hover:text-blue-600 hover:underline cursor-pointer text-ellipsis ${active ? '' : ''}`}
       >
         {heading.title}

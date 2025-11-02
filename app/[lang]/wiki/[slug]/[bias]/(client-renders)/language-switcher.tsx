@@ -73,7 +73,7 @@ export default function LanguageSwitcher({ currentLang, mobile }: ToolsProps) {
           {mobile ? (
             <button type="button" className="w-full px-4 py-2.5 text-left text-sm text-white bg-gray-700 hover:bg-gray-900 rounded-md transition-colors cursor-pointer flex items-center gap-2 min-w-0">
               <div data-svg-wrapper data-property-1="Notes" className="relative">
-                <Languages className="text-gray-500" size={16} />
+                <Languages className="text-gray-500 dark:text-neutral-400 " size={16} />
               </div>
               <div className="pr-1.5 flex-1 flex justify-start items-center gap-2.5 overflow-hidden text-white text-sm">
                 <SlidingLanguage />
@@ -84,9 +84,9 @@ export default function LanguageSwitcher({ currentLang, mobile }: ToolsProps) {
               <a className="hover:underline cursor-pointer">
                 <div className="size- flex justify-start items-center gap-1.5">
                   <div data-svg-wrapper data-property-1="Notes" className="relative">
-                    <Languages className="text-gray-500" size={16} />
+                    <Languages className="text-gray-500 dark:text-neutral-400 " size={16} />
                   </div>
-                  <div className="size- pr-1.5 flex justify-start items-center gap-2.5 overflow-hidden text-gray-500 text-sm">
+                  <div className="size- pr-1.5 flex justify-start items-center gap-2.5 overflow-hidden text-gray-500 dark:text-neutral-400  text-sm">
                     <SlidingLanguage />
                   </div>
                 </div>

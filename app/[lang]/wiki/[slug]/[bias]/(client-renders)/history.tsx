@@ -183,12 +183,12 @@ export default function HistoryPage() {
             <div className="flex items-center gap-2">
               <Label htmlFor={`sort-${id}`} className="text-sm text-muted-foreground font-normal">Sort by:</Label>
               <Select value={sortMode} onValueChange={(v) => { setSortMode(v as any); setPageIndex(0) }}>
-                <SelectTrigger id={`sort-${id}`} className="w-44">
+                <SelectTrigger id={`sort-${id}`} className="w-44 cursor-pointer">
                   <SelectValue placeholder="Sort" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="recent">Most recent</SelectItem>
-                  <SelectItem value="stars">Most stars</SelectItem>
+                  <SelectItem value="recent" className="cursor-pointer">Most recent</SelectItem>
+                  <SelectItem value="stars" className="cursor-pointer">Most stars</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -201,7 +201,7 @@ export default function HistoryPage() {
                   const isStarred = !!starredMap[rev.id]
                   return (
                     <li key={rev.id} className={`w-full ${rev.violatesLaw ? 'opacity-40 pointer-events-none' : ''}`}>
-                      <div className="flex items-center gap-4 p-3 hover:bg-slate-50 dark:hover:bg-slate-800">
+                      <div className="flex items-center gap-4 p-3 hover:bg-slate-50 dark:hover:bg-neutral-800">
                         <div className="flex-2 min-w-0 ml-6 text-left">
                           <div className="text-sm font-medium text-foreground">{formatDate(rev.revisionDate)}</div>
                         </div>

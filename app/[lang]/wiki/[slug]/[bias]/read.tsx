@@ -209,7 +209,7 @@ export default function Read({ slug, lang, bias, revision }: { slug: string, lan
                 </div>
               </div>
             </div>
-            <div className="justify-start text-neutral-800 text-sm font-normal ml-2 leading-normal">Categories:</div>
+            <div className="justify-start text-neutral-800 dark:text-neutral-300 text-sm font-normal ml-2 leading-normal">Categories:</div>
           </div>
           <div className="flex flex-wrap items-center gap-1">
             {categories.map((cat: string, index: number) => (

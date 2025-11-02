@@ -26,7 +26,7 @@ export default function FeaturedArticles({ lang }: { lang: string }) {
   ];
 
   return (
-    <section className="py-12 bg-gray-50 w-11/12 px-6 md:px-12 rounded-lg mb-12">
+    <section className="py-12 bg-gray-50 dark:bg-neutral-800  w-11/12 px-6 md:px-12 rounded-lg mb-12">
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-semibold">Featured Articles</h2>
@@ -40,14 +40,14 @@ export default function FeaturedArticles({ lang }: { lang: string }) {
             <Link
               key={a.slug}
               href={`/${lang}/wiki/${a.slug}`}
-              className="block bg-white rounded-lg shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition p-6 text-left"
+              className="block bg-white dark:bg-neutral-700 rounded-lg shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition p-6 text-left"
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="font-semibold text-lg text-gray-900">{a.title}</h3>
-                  <p className="mt-2 text-sm text-gray-600">{a.description}</p>
+                  <h3 className="font-semibold text-lg text-gray-900 dark:text-neutral-300">{a.title}</h3>
+                  <p className="mt-2 text-sm text-gray-600 dark:text-neutral-400">{a.description}</p>
                 </div>
-                <div className="hidden md:flex items-center">
+                <div className="hidden lg:flex items-center">
                   <span className="inline-block bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">Featured</span>
                 </div>
               </div>

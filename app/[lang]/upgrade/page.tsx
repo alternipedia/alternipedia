@@ -18,7 +18,7 @@ export default async function Pricing({ params }: { params: Promise<{ lang: stri
     <div className="bg-defaultbgmain w-full py-12 px-[15%]">
       {/* Header Section */}
       <div className="mx-auto text-center mb-8">
-        <h1 className="font-h1 cursor-default font-[number:var(--h1-font-weight)] text-black text-2xl sm:text-3xl lg:text-[length:var(--h1-font-size)] tracking-[var(--h1-letter-spacing)] leading-[var(--h1-line-height)] [font-style:var(--h1-font-style)] mb-6">
+        <h1 className="font-h1 cursor-default font-[number:var(--h1-font-weight)] text-2xl sm:text-3xl lg:text-[length:var(--h1-font-size)] tracking-[var(--h1-letter-spacing)] leading-[var(--h1-line-height)] [font-style:var(--h1-font-style)] mb-6">
           📚 {dict.upgrade.title} ⚡
         </h1>
       </div>
@@ -34,13 +34,13 @@ export default async function Pricing({ params }: { params: Promise<{ lang: stri
           </div>
 
           <div className="flex-1 p-6 space-y-4">
-            <p className="font-p font-[number:var(--p-font-weight)] text-black text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
+            <p className="font-p font-[number:var(--p-font-weight)] text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
               {dict.upgrade.freePlan.features.readAll}
             </p>
-            <p className="font-p font-[number:var(--p-font-weight)] text-black text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
+            <p className="font-p font-[number:var(--p-font-weight)] text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
               {dict.upgrade.freePlan.features.basicTheme}
             </p>
-            <p className="font-p font-[number:var(--p-font-weight)] text-black text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
+            <p className="font-p font-[number:var(--p-font-weight)] text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
               {dict.upgrade.freePlan.features.saveArticles}
             </p>
           </div>
@@ -75,31 +75,31 @@ export default async function Pricing({ params }: { params: Promise<{ lang: stri
               {dict.upgrade.proPlan.subtitle}
             </h4>
             <ul className="list-disc list-inside gap-2 flex flex-col">
-              <li className="font-p font-[number:var(--p-font-weight)] text-black text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
+              <li className="font-p font-[number:var(--p-font-weight)] text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
                 {dict.upgrade.proPlan.features.customThemes}
               </li>
-              <li className="font-p font-[number:var(--p-font-weight)] text-black text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
+              <li className="font-p font-[number:var(--p-font-weight)] text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
                 {dict.upgrade.proPlan.features.notes}
               </li>
-              <li className="font-p font-[number:var(--p-font-weight)] text-black text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
+              <li className="font-p font-[number:var(--p-font-weight)] text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
                 {dict.upgrade.proPlan.features.advancedSearch}
               </li>
-              <li className="font-p font-[number:var(--p-font-weight)] text-black text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
+              <li className="font-p font-[number:var(--p-font-weight)] text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
                 {dict.upgrade.proPlan.features.semanticSearch}
               </li>
-              <li className="font-p font-[number:var(--p-font-weight)] text-black text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
+              <li className="font-p font-[number:var(--p-font-weight)]text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
                 {dict.upgrade.proPlan.features.aiAssistant}
               </li>
-              <li className="font-p font-[number:var(--p-font-weight)] text-black text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
+              <li className="font-p font-[number:var(--p-font-weight)] text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
                 {dict.upgrade.proPlan.features.topicMaps}
               </li>
-              <li className="font-p font-[number:var(--p-font-weight)] text-black text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
+              <li className="font-p font-[number:var(--p-font-weight)] text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
                 {dict.upgrade.proPlan.features.profileCustomization}
               </li>
-              <li className="font-p font-[number:var(--p-font-weight)] text-black text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
+              <li className="font-p font-[number:var(--p-font-weight)] text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
                 {dict.upgrade.proPlan.features.aiTranslation}
               </li>
-              <li className="font-p font-[number:var(--p-font-weight)] text-black text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
+              <li className="font-p font-[number:var(--p-font-weight)] text-[length:var(--p-font-size)] tracking-[var(--p-letter-spacing)] leading-[var(--p-line-height)] [font-style:var(--p-font-style)]">
                 {dict.upgrade.proPlan.features.appSupport}
               </li>
             </ul>

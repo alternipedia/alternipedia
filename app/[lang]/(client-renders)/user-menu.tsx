@@ -55,7 +55,7 @@ export default function UserMenu({ lang }: { lang: Locale }) {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild
-        className="px-4 py-2 rounded-md bg-white hover:bg-gray-100 data-[state=open]:bg-gray-200 transition-all">
+        className="px-4 py-2 rounded-mdtransition-all">
         <Button size="icon"
           aria-label="Open account menu"
           variant="ghost"
@@ -139,7 +139,7 @@ export default function UserMenu({ lang }: { lang: Locale }) {
                   <span>{dict.userMenu.login}</span>
                 </DropdownMenuItem>
               </DialogTrigger>
-              <DialogContent allowAutoFocus={false}>
+              <DialogContent allowAutoFocus={false} className="dark:bg-neutral-800">
                 <div className="flex flex-col items-center gap-2">
                   <ScanFace size={52} />
                   <DialogHeader>
@@ -149,7 +149,7 @@ export default function UserMenu({ lang }: { lang: Locale }) {
                   </DialogHeader>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <Button className="bg-[#DB4437] text-white after:flex-1 hover:bg-[#DB4437]/90 cursor-pointer" onClick={() => signIn("google")}>
+                  <Button className="bg-[#DB4437] text-white after:flex-1 hover:bg-[#DB4437]/85 cursor-pointer" onClick={() => signIn("google")}>
                     <span className="pointer-events-none me-2 flex-1">
                       <RiGoogleFill className="opacity-60" size={16} aria-hidden="true" />
                     </span>
@@ -161,13 +161,13 @@ export default function UserMenu({ lang }: { lang: Locale }) {
                     </span>
                     {dict.login.x}
                   </Button> */}
-                  <Button className="bg-[#1877f2] text-white after:flex-1 hover:bg-[#1877f2]/90 cursor-pointer" onClick={() => signIn("facebook")}>
+                  <Button className="bg-[#1877f2] text-white after:flex-1 hover:bg-[#1877f2]/85 cursor-pointer" onClick={() => signIn("facebook")}>
                     <span className="pointer-events-none me-2 flex-1">
                       <RiFacebookFill className="opacity-60" size={16} aria-hidden="true" />
                     </span>
                     {dict.login.facebook}
                   </Button>
-                  <Button className="bg-[#333333] text-white after:flex-1 hover:bg-[#333333]/90 cursor-pointer" onClick={() => signIn("azure-ad")}>
+                  <Button className="bg-[#333333] text-white after:flex-1 hover:bg-[#333333]/85 cursor-pointer" onClick={() => signIn("azure-ad")}>
                     <span className="pointer-events-none me-2 flex-1">
                       <RiMicrosoftFill className="opacity-60" size={16} aria-hidden="true" />
                     </span>

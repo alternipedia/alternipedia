@@ -135,7 +135,7 @@ function TooltipContent({
       <TooltipPrimitive.Portal>
         <div>
           <div 
-            className="fixed inset-0 bg-black/10 z-60 animate-in fade-in-0 duration-200 pointer-events-none"
+            className="fixed inset-0 bg-black/10 dark:bg-black/60 z-60 animate-in fade-in-0 duration-200 pointer-events-none"
           />
           <TooltipPrimitive.Content
             data-slot="tooltip-content"

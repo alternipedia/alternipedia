@@ -139,7 +139,7 @@ export default function CookieBanner() {
       <div
         id="cookie-banner"
         className={
-          `fixed left-0 right-0 z-50 border px-4 py-3 shadow-lg bg-gray-100 transition-all duration-300 ${isClosing ? "opacity-0 translate-y-full" : "opacity-100 translate-y-0"}`
+          `fixed left-0 right-0 z-50 border px-4 py-3 shadow-lg bg-gray-100 dark:bg-neutral-900 transition-all duration-300 ${isClosing ? "opacity-0 translate-y-full" : "opacity-100 translate-y-0"}`
           + `${isMobile ? "" : " bottom-0"}`
         }
         style={{
@@ -150,7 +150,7 @@ export default function CookieBanner() {
             {dict.cookieMessage}
           </p>
           <div className="flex gap-2 max-md:flex-wrap">
-            <Button onClick={handleCookieAccept} className="bg-gray-800 hover:bg-gray-600 text-white px-4 text-sm rounded transition cursor-pointer">
+            <Button onClick={handleCookieAccept} className="bg-neutral-700 hover:bg-neutral-600 text-white px-4 text-sm rounded transition cursor-pointer">
               {dict.accept}
             </Button>
             <Button onClick={handleCookieReject} className="bg-red-800 hover:bg-red-600 text-white px-4 text-sm rounded transition cursor-pointer">
