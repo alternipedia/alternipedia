@@ -15898,6 +15898,9 @@ const mt: Dictionary = {
   }
 };
 
+// TODO: replace with proper Hebrew translation
+const hb = en;
+
 // Export dictionaries
 // Note: Languages beyond the fully translated ones use English text as placeholders
 // These should be professionally translated before production use
@@ -15953,6 +15956,7 @@ const dictionaries: Record<Locale, Dictionary> = {
   bs,
   cnr,
   mt,
+  hb,
 };
 
 export const getDictionary = (locale: Locale): Dictionary => {
