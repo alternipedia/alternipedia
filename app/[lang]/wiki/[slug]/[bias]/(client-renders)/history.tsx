@@ -1,35 +1,17 @@
 "use client"
 
-import { useEffect, useId, useState } from "react"
-import { useParams, usePathname, useSearchParams } from 'next/navigation'
+import { useEffect, useId, useState, useMemo, useCallback, memo } from "react"
+import { useParams, usePathname } from 'next/navigation'
 import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  PaginationState,
-  SortingState,
-  useReactTable,
-} from "@tanstack/react-table";
-import {
-  ChevronDownIcon,
-  ChevronFirstIcon,
-  ChevronLastIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  ChevronUpIcon,
   ExternalLink,
+  Star,
+  TriangleAlert,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Badge } from "@/app/(components)/ui/badge";
 import { Button } from "@/app/(components)/ui/button";
 import { Label } from "@/app/(components)/ui/label";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-} from "@/app/(components)/ui/pagination";
 import {
   Select,
   SelectContent,
@@ -37,118 +19,75 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/app/(components)/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/app/(components)/ui/table";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/app/(components)/ui/tooltip";
+import { useSession } from "next-auth/react";
 
 type Item = {
-  // Revision record (minimal shape used by this table)
   id: string
-  // ISO date or parsable date string
   revisionDate?: string
-  // star count for the revision
   stars?: number
-  // link to view the revision
+  starred?: boolean
   url?: string
+  violatesLaw?: boolean
 }
 
 export default function HistoryPage() {
   const id = useId();
   const path = usePathname();
   const params = useParams();
-  const searchParams = useSearchParams()
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 5,
-  });
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [pageIndex, setPageIndex] = useState<number>(0)
+  const [pageSize, setPageSize] = useState<number>(5)
+  const [sortMode, setSortMode] = useState<'stars'|'recent'>('recent');
   const [data, setData] = useState<Item[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [starredMap, setStarredMap] = useState<Record<string, boolean>>({});
+  const session = useSession();
+
+  const handleToggleRemote = useCallback(async (revId: string, isStarred: boolean) => {
+    // optimistic update
+    setStarredMap((p) => ({ ...p, [revId]: !isStarred }))
+    setData((prev) => prev.map((it) => it.id === revId ? { ...it, stars: isStarred ? Math.max(0, (it.stars ?? 0) - 1) : ((it.stars ?? 0) + 1) } : it ))
+
+    try {
+      if (isStarred) {
+        const resp = await fetch(`/api/stars?revision=${encodeURIComponent(revId)}`, { method: 'DELETE' })
+        if (!resp.ok) throw new Error('Failed to remove star')
+      } else {
+        const resp = await fetch(`/api/stars`, { method: 'POST', body: JSON.stringify({ revisionId: Number(revId) }), headers: { 'Content-Type': 'application/json' } })
+        if (!resp.ok) throw new Error('Failed to add star')
+      }
+    } catch (e) {
+      // revert optimistic update on error
+      setStarredMap((p) => ({ ...p, [revId]: isStarred }))
+      setData((prev) => prev.map((it) => it.id === revId ? { ...it, stars: isStarred ? ((it.stars ?? 0) + 1) : Math.max(0, (it.stars ?? 0) - 1) } : it ))
+      console.error(e)
+      // eslint-disable-next-line no-alert
+      alert((e as any)?.message || 'Could not toggle star')
+    }
+  }, [])
+
+  const StarCell = memo(function StarCell({ revId, stars, isStarred, onToggle }: { revId: string, stars: number, isStarred: boolean, onToggle: (revId: string, isStarred: boolean) => void }) {
+    return (
+      <div className="flex content-center items-center m-auto">
+        <Badge
+          onClick={(event) => session.status === "authenticated" ? onToggle(revId, isStarred) : event.stopPropagation()}
+          className={`px-2 cursor-pointer hover:opacity-80 ${isStarred ? 'bg-yellow-50 text-yellow-800 border-transparent' : ''}`}
+          variant={'default'}
+        >
+          <Star className={`-ms-0.5 ${isStarred ? 'text-yellow-400' : 'opacity-60'}`} size={12} aria-hidden="true" />
+          {isStarred ? 'Starred' : 'Stars'}
+          <span className={`text-[0.625rem] font-medium ${isStarred ? 'text-yellow-400' : 'text-primary-foreground/60'}`}>
+            {String(stars)}
+          </span>
+        </Badge>
+      </div>
+    )
+  })
 
   if (typeof window === 'undefined') {
     return null;
   }
-
-  const columns: ColumnDef<Item>[] = [
-    {
-      header: "Date",
-      accessorKey: "revisionDate",
-      cell: ({ row }) => {
-        const value = row.getValue("revisionDate") || row.original.revisionDate
-        if (!value) return <div className="text-muted-foreground">—</div>
-        // Format date safely
-        let formatted = String(value);
-        try {
-          formatted = new Intl.DateTimeFormat(undefined, {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          }).format(new Date(String(value)))
-        } catch (e) {
-          // fallback to raw
-        }
-        return <div className="font-medium float-left mx-5">{formatted}</div>
-      },
-      size: window.innerWidth > 768 ? 260 : 140,
-    },
-    {
-      id: "stars",
-      header: "",
-      accessorKey: "stars",
-      // middle column: small, float-right badge that shows star count when clicked
-      cell: ({ row }) => {
-        const stars = (row.getValue("stars") ?? row.original.stars ?? 0) as number
-        return (
-          <div className="w-full flex">
-            <div className="mx-auto">
-              <Badge
-                onClick={() => alert(`${stars} stars`)}
-                className="items-baseline gap-1.5 cursor-pointer"
-              >
-                Stars
-                <span className="text-[0.625rem] font-medium text-primary-foreground/60">
-                  {String(stars)}
-                </span>
-              </Badge>
-            </div>
-          </div>
-        )
-      },
-      size: 120,
-    },
-    {
-      header: "",
-      accessorKey: "url",
-      // right column: small icon linking to the revision
-      cell: ({ row }) => {
-        const url = (row.getValue("url") || row.original.url) as string | undefined
-        return (
-          <div className="w-full flex">
-            <div className="ml-auto">
-              {url ? (
-                <a
-                  href={url}
-                  aria-label="View revision"
-                  className="inline-flex h-8 w-8 items-center justify-center rounded hover:bg-muted"
-                >
-                  <ExternalLink />
-                </a>
-              ) : (
-                <div className="h-8 w-8" />
-              )}
-            </div>
-          </div>
-        )
-      },
-      size: 80,
-    },
-  ]
 
   useEffect(() => {
     async function load() {
@@ -158,9 +97,8 @@ export default function HistoryPage() {
         const slug = params?.slug
         const lang = params?.lang || 'en'
         const bias = path?.split('/')[4] || '';
-        
+
         if (!slug || !bias) {
-          // nothing to fetch
           setData([])
           setLoading(false)
           return
@@ -168,7 +106,7 @@ export default function HistoryPage() {
 
         const q = new URLSearchParams({ slug: String(slug), lang: String(lang), bias: String(bias) })
         const resp = await fetch(`/api/revisions?${q.toString()}`)
-        if (!resp.ok) throw new Error(`API error: ${resp.status}`)
+        if (!resp.ok) throw new Error(`API error: ${resp.status}`);
         const body = await resp.json()
         const mapped: Item[] = (body.revisions || []).map((r: any) => {
           const slugVal = String(slug)
@@ -179,10 +117,13 @@ export default function HistoryPage() {
             id: String(r.id),
             revisionDate: r.createdAt,
             stars: r.stars ?? 0,
+            starred: !!r.starred,
+            violatesLaw: !!r.violatesLaw,
             url,
           }
-        })
+        });
         setData(mapped)
+        setStarredMap(mapped.reduce((acc, it) => { acc[it.id] = !!it.starred; return acc }, {} as Record<string, boolean>))
       } catch (err: any) {
         console.error(err)
         setError(err?.message || 'Failed to load revisions')
@@ -192,240 +133,144 @@ export default function HistoryPage() {
     }
 
     load()
-  }, [])
+  }, [params, path])
 
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    enableSortingRemoval: false,
-    getPaginationRowModel: getPaginationRowModel(),
-    onPaginationChange: setPagination,
-    state: {
-      sorting,
-      pagination,
-    },
-  })
+  // client-side sorting
+  const sorted = useMemo(() => {
+    if (!data) return [] as Item[]
+    const copy = [...data]
+    if (sortMode === 'stars') {
+      copy.sort((a, b) => (b.stars ?? 0) - (a.stars ?? 0))
+    } else {
+      copy.sort((a, b) => {
+        const da = a.revisionDate ? new Date(a.revisionDate).getTime() : 0
+        const db = b.revisionDate ? new Date(b.revisionDate).getTime() : 0
+        return db - da
+      })
+    }
+    return copy
+  }, [data, sortMode])
+
+  const pageCount = Math.max(1, Math.ceil(sorted.length / pageSize))
+  const paginated = useMemo(() => {
+    const start = pageIndex * pageSize
+    return sorted.slice(start, start + pageSize)
+  }, [sorted, pageIndex, pageSize])
+
+  useEffect(() => {
+    if (pageIndex >= pageCount) setPageIndex(Math.max(0, pageCount - 1))
+  }, [pageCount, pageIndex])
+
+  function formatDate(value?: string) {
+    if (!value) return '—'
+    try {
+      return new Intl.DateTimeFormat(undefined, { year: 'numeric', month: 'short', day: 'numeric' }).format(new Date(value))
+    } catch (e) {
+      return String(value)
+    }
+  }
 
   return (
     <div className="space-y-4">
       {loading ? (
         <div className="text-center text-sm text-muted-foreground">Loading revisions…</div>
+      ) : error ? (
+        <div className="text-center text-sm text-red-500">{error}</div>
       ) : (
         <>
-          {error ? (
-            <div className="text-center text-sm text-red-500">{error}</div>
-          ) : (
-            <>
-              <div className="overflow-hidden rounded-md border bg-background">
-                <Table className="table-fixed">
-                  <TableHeader className="hidden">
-                    {table.getHeaderGroups().map((headerGroup) => (
-                      <TableRow key={headerGroup.id} className="hover:bg-transparent">
-                        {headerGroup.headers.map((header) => {
-                          return (
-                            <TableHead
-                              key={header.id}
-                              style={{ width: `${header.getSize()}px` }}
-                              className="h-11"
-                            >
-                              {header.isPlaceholder ? null : header.column.getCanSort() ? (
-                                <div
-                                  className={cn(
-                                    header.column.getCanSort() &&
-                                    "flex h-full cursor-pointer items-center justify-between gap-2 select-none"
-                                  )}
-                                  onClick={header.column.getToggleSortingHandler()}
-                                  onKeyDown={(e) => {
-                                    // Enhanced keyboard handling for sorting
-                                    if (
-                                      header.column.getCanSort() &&
-                                      (e.key === "Enter" || e.key === " ")
-                                    ) {
-                                      e.preventDefault()
-                                      header.column.getToggleSortingHandler()?.(e)
-                                    }
-                                  }}
-                                  tabIndex={header.column.getCanSort() ? 0 : undefined}
-                                >
-                                  {flexRender(
-                                    header.column.columnDef.header,
-                                    header.getContext()
-                                  )}
-                                  {{
-                                    asc: (
-                                      <ChevronUpIcon
-                                        className="shrink-0 opacity-60"
-                                        size={16}
-                                        aria-hidden="true"
-                                      />
-                                    ),
-                                    desc: (
-                                      <ChevronDownIcon
-                                        className="shrink-0 opacity-60"
-                                        size={16}
-                                        aria-hidden="true"
-                                      />
-                                    ),
-                                  }[header.column.getIsSorted() as string] ?? null}
-                                </div>
-                              ) : (
-                                flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext()
-                                )
-                              )}
-                            </TableHead>
-                          )
-                        })}
-                      </TableRow>
-                    ))}
-                  </TableHeader>
-                  <TableBody>
-                    {table.getRowModel().rows?.length ? (
-                      table.getRowModel().rows.map((row) => (
-                        <TableRow
-                          key={row.id}
-                          data-state={row.getIsSelected() && "selected"}
-                        >
-                          {row.getVisibleCells().map((cell) => (
-                            <TableCell width={cell.column.getSize()} key={cell.id}>
-                              {flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext()
-                              )}
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell
-                          colSpan={columns.length}
-                          className="h-24 text-center"
-                        >
-                          No results.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
+          <div className="flex items-start justify-between">
+            <div />
+            <div className="flex items-center gap-2">
+              <Label htmlFor={`sort-${id}`} className="text-sm text-muted-foreground font-normal">Sort by:</Label>
+              <Select value={sortMode} onValueChange={(v) => { setSortMode(v as any); setPageIndex(0) }}>
+                <SelectTrigger id={`sort-${id}`} className="w-44 cursor-pointer">
+                  <SelectValue placeholder="Sort" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="recent" className="cursor-pointer">Most recent</SelectItem>
+                  <SelectItem value="stars" className="cursor-pointer">Most stars</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
-              {/* Pagination */}
-              <div className="flex items-center justify-between gap-8">
-                {/* Results per page */}
-                <div className="flex items-center gap-3">
-                  <Label htmlFor={id}>
-                    Rows per page
-                  </Label>
-                  <Select
-                    value={table.getState().pagination.pageSize.toString()}
-                    onValueChange={(value) => {
-                      table.setPageSize(Number(value))
-                    }}
-                  >
-                    <SelectTrigger id={id} className="w-fit whitespace-nowrap">
-                      <SelectValue placeholder="Select number of results" />
-                    </SelectTrigger>
-                    <SelectContent className="[&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2">
-                      {[5, 10, 25, 50].map((pageSize) => (
-                        <SelectItem key={pageSize} value={pageSize.toString()}>
-                          {pageSize}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                {/* Page number information */}
-                <div className="flex grow justify-end text-sm whitespace-nowrap text-muted-foreground">
-                  <p
-                    className="text-sm whitespace-nowrap text-muted-foreground"
-                    aria-live="polite"
-                  >
-                    <span className="text-foreground">
-                      {table.getState().pagination.pageIndex *
-                        table.getState().pagination.pageSize +
-                        1}
-                      -
-                      {Math.min(
-                        Math.max(
-                          table.getState().pagination.pageIndex *
-                          table.getState().pagination.pageSize +
-                          table.getState().pagination.pageSize,
-                          0
-                        ),
-                        table.getRowCount()
-                      )}
-                    </span>{" "}
-                    of{" "}
-                    <span className="text-foreground">
-                      {table.getRowCount().toString()}
-                    </span>
-                  </p>
-                </div>
-                {/* Pagination buttons */}
-                <div>
-                  <Pagination>
-                    <PaginationContent>
-                      {/* First page button */}
-                      <PaginationItem>
-                        <Button
-                          size="icon"
-                          variant="outline"
-                          className="disabled:pointer-events-none disabled:opacity-50"
-                          onClick={() => table.firstPage()}
-                          disabled={!table.getCanPreviousPage()}
-                          aria-label="Go to first page"
-                        >
-                          <ChevronFirstIcon size={16} aria-hidden="true" />
-                        </Button>
-                      </PaginationItem>
-                      {/* Previous page button */}
-                      <PaginationItem>
-                        <Button
-                          size="icon"
-                          variant="outline"
-                          className="disabled:pointer-events-none disabled:opacity-50"
-                          onClick={() => table.previousPage()}
-                          disabled={!table.getCanPreviousPage()}
-                          aria-label="Go to previous page"
-                        >
-                          <ChevronLeftIcon size={16} aria-hidden="true" />
-                        </Button>
-                      </PaginationItem>
-                      {/* Next page button */}
-                      <PaginationItem>
-                        <Button
-                          size="icon"
-                          variant="outline"
-                          className="disabled:pointer-events-none disabled:opacity-50"
-                          onClick={() => table.nextPage()}
-                          disabled={!table.getCanNextPage()}
-                          aria-label="Go to next page"
-                        >
-                          <ChevronRightIcon size={16} aria-hidden="true" />
-                        </Button>
-                      </PaginationItem>
-                      {/* Last page button */}
-                      <PaginationItem>
-                        <Button
-                          size="icon"
-                          variant="outline"
-                          className="disabled:pointer-events-none disabled:opacity-50"
-                          onClick={() => table.lastPage()}
-                          disabled={!table.getCanNextPage()}
-                          aria-label="Go to last page"
-                        >
-                          <ChevronLastIcon size={16} aria-hidden="true" />
-                        </Button>
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
-                </div>
+          <div className="rounded-md border bg-background">
+            {paginated.length ? (
+              <ul className="divide-y">
+                {paginated.map((rev) => {
+                  const isStarred = !!starredMap[rev.id]
+                  return (
+                    <li key={rev.id} className={`w-full ${rev.violatesLaw ? 'opacity-40 pointer-events-none' : ''}`}>
+                      <div className="flex items-center gap-4 p-3 hover:bg-slate-50 dark:hover:bg-neutral-800">
+                        <div className="flex-2 min-w-0 ml-6 text-left">
+                          <div className="text-sm font-medium text-foreground">{formatDate(rev.revisionDate)}</div>
+                        </div>
+                        <div className="flex flex-1 items-center justify-end mr-4 gap-2">
+                          <StarCell revId={rev.id} stars={rev.stars ?? 0} isStarred={isStarred} onToggle={handleToggleRemote} />
+                          <TooltipProvider delayDuration={0}>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button aria-label="Report revision" className="inline-flex h-8 w-8 items-center justify-center rounded hover:bg-muted cursor-pointer">
+                                  <TriangleAlert />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent className="px-2 py-1 text-xs" showArrow>Report</TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+
+                          {rev.url ? (
+                            <TooltipProvider delayDuration={0}>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <a href={rev.url} aria-label="Open revision" className="inline-flex h-8 w-8 items-center justify-center rounded hover:bg-muted">
+                                    <ExternalLink />
+                                  </a>
+                                </TooltipTrigger>
+                                <TooltipContent className="px-2 py-1 text-xs" showArrow>Open</TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          ) : null}
+                        </div>
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
+            ) : (
+              <div className="p-6 text-center text-sm text-muted-foreground">No results.</div>
+            )}
+          </div>
+
+          {/* Pagination controls */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Label htmlFor={id}>Rows per page</Label>
+              <Select value={String(pageSize)} onValueChange={(v) => { setPageSize(Number(v)); setPageIndex(0) }}>
+                <SelectTrigger id={id} className="w-fit whitespace-nowrap">
+                  <SelectValue placeholder="Select number of results" />
+                </SelectTrigger>
+                <SelectContent>
+                  {[5, 10].map((n) => (
+                    <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-muted-foreground">
+                {sorted.length === 0 ? '0' : pageIndex * pageSize + 1}-{Math.min((pageIndex + 1) * pageSize, sorted.length)} of {sorted.length}
               </div>
-            </>
-          )}
+              <div className="flex items-center gap-2">
+                <Button size="icon" variant="outline" onClick={() => setPageIndex((p) => Math.max(0, p - 1))} disabled={pageIndex <= 0} aria-label="Previous page">
+                  <ChevronLeftIcon size={16} aria-hidden="true" />
+                </Button>
+                <Button size="icon" variant="outline" onClick={() => setPageIndex((p) => Math.min(pageCount - 1, p + 1))} disabled={pageIndex >= pageCount - 1} aria-label="Next page">
+                  <ChevronRightIcon size={16} aria-hidden="true" />
+                </Button>
+              </div>
+            </div>
+          </div>
         </>
       )}
     </div>

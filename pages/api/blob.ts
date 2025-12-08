@@ -64,7 +64,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           try {
             const biasIdNum = Number(biasId);
             
-            await prisma.uploadedBlobs.create({
+            await prisma.blob.create({
               data: {
                 bias: { connect: { id: biasIdNum } },
                 url: blob.url,

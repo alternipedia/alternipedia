@@ -80,8 +80,8 @@ export default function ContentEditorComponent({ slug, lang, bias, revision }: {
     shouldRerenderOnTransaction: false,
     editorProps: {
       attributes: {
-        autocomplete: "off",
-        autocorrect: "off",
+        autocomplete: "on",
+        autocorrect: "on",
         autocapitalize: "off",
         "aria-label": "Main content area, start typing to enter text.",
         class: "simple-editor",
@@ -141,7 +141,7 @@ export default function ContentEditorComponent({ slug, lang, bias, revision }: {
         tags.push({ id: String(tag.category.id), text: tag.category.name });
       }
       setTags(tags);
-      
+
       let blocks: any[] = [];
       const revisionBlocks = revision?.revisionBlocks || [];
       for (const revisionBlock of revisionBlocks) {
@@ -276,7 +276,7 @@ export default function ContentEditorComponent({ slug, lang, bias, revision }: {
   };
 
 
-  if (status === "unauthenticated") { 
+  if (status === "unauthenticated") {
     return (
       <div className="p-4 border border-destructive/20 rounded-md bg-destructive/5 wikipedia-article">
         <div className="text-destructive font-medium">Editor Unavailable</div>

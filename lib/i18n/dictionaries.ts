@@ -583,7 +583,7 @@ const en: Dictionary = {
       liberal: 'This content has been written by community contributors to represent a liberal perspective — focusing on individual freedoms, democracy, and social reform.',
       nationalist: 'This section has been developed by contributors to reflect a nationalist perspective — focusing on cultural identity, sovereignty, and pride in national heritage.',
       wikipedia: {
-        part1: 'The following selected content bias is sourced from Wikipedia and represents their community-edited perspective. To edit or discuss this version, please',
+        part1: 'The following selected content is sourced from Wikipedia and represents their community-edited perspective. To edit or discuss this version, please',
         part2: 'view on Wikipedia →'
       },
     },
@@ -15898,6 +15898,9 @@ const mt: Dictionary = {
   }
 };
 
+// TODO: replace with proper Hebrew translation
+const hb = en;
+
 // Export dictionaries
 // Note: Languages beyond the fully translated ones use English text as placeholders
 // These should be professionally translated before production use
@@ -15953,6 +15956,7 @@ const dictionaries: Record<Locale, Dictionary> = {
   bs,
   cnr,
   mt,
+  hb,
 };
 
 export const getDictionary = (locale: Locale): Dictionary => {

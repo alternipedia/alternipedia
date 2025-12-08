@@ -21,6 +21,22 @@ import { DOMOutputSpec } from '@tiptap/pm/model';
 import { mergeAttributes } from '@tiptap/react';
 
 export default function Read({ slug, lang, bias, revision }: { slug: string, lang: string, bias: string, revision: any }) {
+  // If this revision has been flagged as violating law, do not render its
+  // content. Instead show a clear blocked message to the user.
+  if (revision?.violatesLaw) {
+    return (
+      <>
+        <ClientLoadedSignal />
+        <div className="w-full flex flex-col items-center justify-center p-6">
+          <div className="text-6xl mb-4">🚫</div>
+          <div className="text-lg font-semibold mb-2">Content not allowed</div>
+          <div className="text-sm text-muted-foreground text-center max-w-xl">
+            This revision has been blocked because it was reported as violating applicable laws or site policy. You cannot view the content of this revision.
+          </div>
+        </div>
+      </>
+    )
+  }
   const doc = {
     type: "doc",
     content: !!revision?.revisionBlocks ? revision.revisionBlocks.map((rb: any) => rb.block.content) : [],
@@ -193,7 +209,7 @@ export default function Read({ slug, lang, bias, revision }: { slug: string, lan
                 </div>
               </div>
             </div>
-            <div className="justify-start text-neutral-800 text-sm font-normal ml-2 leading-normal">Categories:</div>
+            <div className="justify-start text-neutral-800 dark:text-neutral-300 text-sm font-normal ml-2 leading-normal">Categories:</div>
           </div>
           <div className="flex flex-wrap items-center gap-1">
             {categories.map((cat: string, index: number) => (

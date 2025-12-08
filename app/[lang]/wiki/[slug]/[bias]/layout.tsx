@@ -420,6 +420,7 @@ export default function Article({
   useEffect(() => {
     const onUnload = () => {
       setIsLoadingBias(true);
+
       (window as any).__page_loaded_handled__ = false;
 
       if (typeof window !== 'undefined') {
@@ -438,6 +439,25 @@ export default function Article({
     window.addEventListener("unload-signal", onUnload);
     return () => window.removeEventListener("unload-signal", onUnload);
   }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    params.delete('content');
+
+    const newPathSegments = pathname?.split('/');
+    console.log(newPathSegments)
+
+    const newPathSegmentsSplitIndex = newPathSegments?.indexOf('thread');
+
+    if (newPathSegmentsSplitIndex && newPathSegmentsSplitIndex > -1) {
+      newPathSegments?.splice(newPathSegmentsSplitIndex, newPathSegments.length);
+    }
+
+    const newPathname = newPathSegments?.join('/');
+    console.log(newPathname);
+
+    window.history.replaceState(null, '', `${newPathname}?${params.toString()}`);
+  }, [pathname]);
 
   const handleApplyBias = (bias: string, opts?: { replace?: boolean }) => {
     window.dispatchEvent(new CustomEvent('unload-signal'));
@@ -482,9 +502,9 @@ export default function Article({
   }, [prevPathname.current, pathname]);
 
   return (
-    <div className="relative bg-white min-h-screen overflow-x-hidden">
+    <div className="relative bg-white dark:bg-neutral-900 min-h-screen overflow-x-hidden">
       {/* HEADER - ToggleGroup shown first on mobile, positioned in center on desktop */}
-      <div className="lg:mx-72 xl:mx-80 2xl:mx-96 px-4 pt-2 overflow-x-hidden sm:-mb-4 md:-mb-4 lg:relative lg:z-10">
+      <div className="lg:mx-64 xl:mx-64 2xl:mx-96 px-4 pt-2 overflow-x-hidden sm:-mb-4 md:-mb-4 lg:relative lg:z-10">
         <div className="flex items-center justify-between pb-1">
           <span className="text-xl pl-2">{dict.bias.title}</span>
           <span className="text-md pr-2 pointer-default cursor-context-menu">
@@ -539,19 +559,19 @@ export default function Article({
       {/* LEFT SIDEBAR  */}
       <div
         id="left-sidebar"
-        className="w-full lg:w-64 lg:fixed lg:left-4 xl:left-8 2xl:left-20 px-4 lg:px-0 overflow-y-auto overflow-x-hidden lg:z-10 hidden lg:block"
+        className="w-full lg:w-64 lg:fixed lg:left-2 xl:left-2 2xl:left-20 px-4 lg:px-0 overflow-y-auto overflow-x-hidden lg:z-10 hidden lg:block"
         style={{
           top: isMobile ? 'auto' : `${sidebarTop}px`,
           height: isMobile ? 'auto' : sidebarHeight,
         }}
       >
-        <div className="w-full lg:w-64 relative overflow-x-hidden">
+        <div className="w-full relative overflow-x-hidden">
           <Collapsible open={contentsOpen} onOpenChange={setContentsOpen}>
-            <div className="w-full lg:w-64 flex justify-between items-start overflow-x-hidden">
-              <div className="w-full lg:w-64 relative inline-flex flex-col justify-start items-start overflow-x-hidden">
+            <div className="w-full flex justify-between items-start overflow-x-hidden">
+              <div className="w-full relative inline-flex flex-col justify-start items-start overflow-x-hidden px-0.5">
                 <div className="relative w-full">
                   <CollapsibleTrigger className="h-10 px-1.5 py-[5px] inline-flex justify-between items-center gap-2.5 w-full transition-colors cursor-pointer">
-                    <div className="justify-start text-neutral-800 text-sm font-bold ">{dict.article.content}</div>
+                    <div className="justify-start text-neutral-800 dark:text-neutral-300 text-sm font-bold ">{dict.article.content}</div>
                     <div data-svg-wrapper className="relative">
                       {contentsOpen ? (
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -585,19 +605,19 @@ export default function Article({
       <div
         id="right-sidebar"
         data-property-1="Default"
-        className="w-full lg:w-64 lg:fixed lg:right-4 xl:right-8 2xl:right-20 px-4 lg:px-0 py-4 lg:py-0 overflow-y-auto overflow-x-hidden lg:z-10 hidden lg:block overscroll-none"
+        className="w-full lg:w-64 lg:fixed lg:right-2 xl:right-2 2xl:right-20 px-4 lg:px-0 py-4 lg:py-0 overflow-y-auto overflow-x-hidden lg:z-10 hidden lg:block overscroll-none"
         style={{
           top: isMobile ? 'auto' : `${sidebarTop}px`,
           height: isMobile ? 'auto' : sidebarHeight,
         }}
       >
-        <div className="w-full lg:w-64 relative overflow-x-hidden">
+        <div className="w-full relative overflow-x-hidden">
           <Collapsible open={toolsOpen} onOpenChange={setToolsOpen}>
-            <div className="w-full lg:w-64 flex justify-between items-start overflow-x-hidden">
-              <div className="w-full lg:w-64 relative inline-flex flex-col justify-start items-start overflow-x-hidden">
+            <div className="w-full flex justify-between items-start overflow-x-hidden">
+              <div className="w-full relative inline-flex flex-col justify-start items-start overflow-x-hidden px-0.5">
                 <div className="relative w-full">
                   <CollapsibleTrigger className="h-10 px-1.5 py-[5px] inline-flex justify-between items-center gap-2.5 w-full transition-colors cursor-pointer">
-                    <div className="justify-start text-neutral-800 text-sm font-bold ">{dict.article.tools}</div>
+                    <div className="justify-start text-neutral-800 dark:text-neutral-300  text-sm font-bold ">{dict.article.tools}</div>
                     <div data-svg-wrapper className="relative">
                       {toolsOpen ? (
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -621,10 +641,10 @@ export default function Article({
                       <a href="#" className="hover:underline">
                         <div className="size- flex justify-start items-center gap-1.5">
                           <div data-svg-wrapper data-property-1="Speech" className="relative">
-                            <Speech className="text-gray-500" size={16} />
+                            <Speech className="text-gray-500 dark:text-neutral-400 " size={16} />
                           </div>
                           <div className="size- pr-1.5 flex justify-start items-center gap-2.5 overflow-hidden">
-                            <div className="justify-start text-gray-500 text-sm font-normal leading-normal truncate">{dict.tools.textToSpeech}</div>
+                            <div className="justify-start text-gray-500 dark:text-neutral-400 text-sm font-normal leading-normal truncate">{dict.tools.textToSpeech}</div>
                           </div>
                         </div>
                       </a>
@@ -634,15 +654,15 @@ export default function Article({
                       <a className="hover:underline cursor-not-allowed">
                         <div className="size- flex justify-start items-center gap-1.5">
                           <div data-svg-wrapper data-property-1="Map" className="relative">
-                            <Earth className="text-gray-500" size={16} />
+                            <Earth className="text-gray-500 dark:text-neutral-400 " size={16} />
                           </div>
                           <div className="size- pr-1.5 flex justify-start items-center gap-2.5 overflow-hidden">
-                            <div className="justify-start text-gray-500 text-sm font-normal leading-normal truncate">{dict.tools.translate}</div>
+                            <div className="justify-start text-gray-500 dark:text-neutral-400 text-sm font-normal leading-normal truncate">{dict.tools.translate}</div>
                           </div>
                         </div>
                       </a>
                       <div className="size- ml-auto float-right px-[5px] py-px bg-yellow-400 rounded-sm flex justify-center items-center gap-2.5 pointer-events-none">
-                        <div className="justify-center text-white text-xs font-bold ">{dict.upgrade.pro}</div>
+                        <div className="justify-center text-white dark:text-black text-xs font-bold ">{dict.upgrade.pro}</div>
                       </div>
                     </div>
 
@@ -650,15 +670,15 @@ export default function Article({
                       <a className="hover:underline cursor-not-allowed">
                         <div className="size- flex justify-start items-center gap-1.5">
                           <div data-svg-wrapper data-property-1="Map" className="relative">
-                            <Waypoints className="text-gray-500" size={16} />
+                            <Waypoints className="text-gray-500 dark:text-neutral-400 " size={16} />
                           </div>
                           <div className="size- pr-1.5 flex justify-start items-center gap-2.5 overflow-hidden">
-                            <div className="justify-start text-gray-500 text-sm font-normal leading-normal truncate">{dict.tools.topicMap}</div>
+                            <div className="justify-start text-gray-500 dark:text-neutral-400 text-sm font-normal leading-normal truncate">{dict.tools.topicMap}</div>
                           </div>
                         </div>
                       </a>
                       <div className="size- ml-auto float-right px-[5px] py-px bg-yellow-400 rounded-sm flex justify-center items-center gap-2.5 pointer-events-none">
-                        <div className="justify-center text-white text-xs font-bold ">{dict.upgrade.pro}</div>
+                        <div className="justify-center text-white dark:text-black text-xs font-bold ">{dict.upgrade.pro}</div>
                       </div>
                     </div>
 
@@ -666,30 +686,30 @@ export default function Article({
                       <a className="hover:underline cursor-not-allowed">
                         <div className="size- flex justify-start items-center gap-1.5">
                           <div data-svg-wrapper data-property-1="Notes" className="relative">
-                            <NotebookPen className="text-gray-500" size={16} />
+                            <NotebookPen className="text-gray-500 dark:text-neutral-400 " size={16} />
                           </div>
                           <div className="size- pr-1.5 flex justify-start items-center gap-2.5 overflow-hidden">
-                            <div className="justify-start text-gray-500 text-sm font-normal leading-normal truncate">{dict.tools.notes}</div>
+                            <div className="justify-start text-gray-500 dark:text-neutral-400 text-sm font-normal leading-normal truncate">{dict.tools.notes}</div>
                           </div>
                         </div>
                       </a>
                       <div className="size- ml-auto float-right px-[5px] py-px bg-yellow-400 rounded-sm flex justify-center items-center gap-2.5 pointer-events-none">
-                        <div className="justify-center text-white text-xs font-bold ">{dict.upgrade.pro}</div>
+                        <div className="justify-center text-white dark:text-black text-xs font-bold ">{dict.upgrade.pro}</div>
                       </div>
                     </div>
                     <div data-property-1="Default" className="self-stretch p-1.5 rounded-md inline-flex justify-between items-center">
                       <a className="hover:underline cursor-not-allowed">
                         <div className="size- flex justify-start items-center gap-1.5">
                           <div data-svg-wrapper data-property-1="AI" className="relative">
-                            <Bot className="text-gray-500" size={16} />
+                            <Bot className="text-gray-500 dark:text-neutral-400 " size={16} />
                           </div>
                           <div className="size- pr-1.5 flex justify-start items-center gap-2.5 overflow-hidden">
-                            <div className="justify-start text-gray-500 text-sm font-normal leading-normal truncate">{dict.tools.wikipal}</div>
+                            <div className="justify-start text-gray-500 dark:text-neutral-400 text-sm font-normal leading-normal truncate">{dict.tools.wikipal}</div>
                           </div>
                         </div>
                       </a>
                       <div className="size- ml-auto float-right px-[5px] py-px bg-yellow-400 rounded-sm flex justify-center items-center gap-2.5 pointer-events-none">
-                        <div className="justify-center text-white text-xs font-bold ">{dict.upgrade.pro}</div>
+                        <div className="justify-center text-white dark:text-black text-xs font-bold ">{dict.upgrade.pro}</div>
                       </div>
                     </div>
 
@@ -697,15 +717,15 @@ export default function Article({
                       <a className="hover:underline cursor-not-allowed">
                         <div className="size- flex justify-start items-center gap-1.5">
                           <div data-svg-wrapper data-property-1="Watch" className="relative">
-                            <Star className="text-gray-500" size={16} />
+                            <Star className="text-gray-500 dark:text-neutral-400 " size={16} />
                           </div>
                           <div className="size- pr-1.5 flex justify-start items-center gap-2.5 overflow-hidden">
-                            <div className="justify-start text-gray-500 text-sm font-normal leading-normal truncate">{dict.tools.watchChanges}</div>
+                            <div className="justify-start text-gray-500 dark:text-neutral-400 text-sm font-normal leading-normal truncate">{dict.tools.watchChanges}</div>
                           </div>
                         </div>
                       </a>
                       <div className="size- ml-auto float-right px-[5px] py-px bg-yellow-400 rounded-sm flex justify-center items-center gap-2.5 pointer-events-none">
-                        <div className="justify-center text-white text-xs font-bold ">{dict.upgrade.pro}</div>
+                        <div className="justify-center text-white dark:text-black text-xs font-bold ">{dict.upgrade.pro}</div>
                       </div>
                     </div>
 
@@ -719,19 +739,19 @@ export default function Article({
                         <div className="size- flex justify-start items-center gap-1.5">
                           <div data-svg-wrapper data-property-1="Watch" className="relative" id="article-saved">
                             {saving ? (
-                              <Loader className="text-gray-500 animate-spin" size={16} />
+                              <Loader className="text-gray-500 animate-spin dark:text-neutral-400 " size={16} />
                             ) : (
                               <>
                                 {isSaved ? (
-                                  <BookmarkCheck id="article-is-saved" className="text-gray-500" size={16} />
+                                  <BookmarkCheck id="article-is-saved" className="text-gray-500 dark:text-neutral-400 " size={16} />
                                 ) : (
-                                  <Bookmark id="article-not-saved" className="text-gray-500" size={16} />
+                                  <Bookmark id="article-not-saved" className="text-gray-500 dark:text-neutral-400 " size={16} />
                                 )}
                               </>
                             )}
                           </div>
                           <div className="size- pr-1.5 flex justify-start items-center gap-2.5 overflow-hidden">
-                            <div className="justify-start text-gray-500 text-sm font-normal leading-normal truncate">
+                            <div className="justify-start text-gray-500 dark:text-neutral-400 text-sm font-normal leading-normal truncate">
                               {saving ? 'Saving...' : (isSaved ? 'Article saved' : dict.tools.saveArticle)}
                             </div>
                           </div>
@@ -745,10 +765,10 @@ export default function Article({
                       <a href="" className="hover:underline">
                         <div className="size- flex justify-start items-center gap-1.5">
                           <div data-svg-wrapper data-property-1="Cite" className="relative">
-                            <Quote className="text-gray-500" size={16} />
+                            <Quote className="text-gray-500 dark:text-neutral-400 " size={16} />
                           </div>
                           <div className="size- pr-1.5 flex justify-start items-center gap-2.5 overflow-hidden">
-                            <div className="justify-start text-gray-500 text-sm font-normal leading-normal truncate">{dict.tools.citePage}</div>
+                            <div className="justify-start text-gray-500 dark:text-neutral-400 text-sm font-normal leading-normal truncate">{dict.tools.citePage}</div>
                           </div>
                         </div>
                       </a>
@@ -759,21 +779,21 @@ export default function Article({
                           <a className="hover:underline cursor-pointer">
                             <div className="size- flex justify-start items-center gap-1.5">
                               <div data-svg-wrapper data-property-1="QR" className="relative">
-                                <QrCode className="text-gray-500" size={16} />
+                                <QrCode className="text-gray-500 dark:text-neutral-400 " size={16} />
                               </div>
                               <div className="size- pr-1.5 flex justify-start items-center gap-2.5 overflow-hidden">
-                                <div className="justify-start text-gray-500 text-sm font-normal leading-normal truncate">{dict.tools.QRCode}</div>
+                                <div className="justify-start text-gray-500 dark:text-neutral-400 text-sm font-normal leading-normal truncate">{dict.tools.QRCode}</div>
                               </div>
                             </div>
                           </a>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="dark:bg-neutral-800">
                           <DialogHeader>
                             <DialogTitle className="hidden">{dict.tools.QRCode}</DialogTitle>
                           </DialogHeader>
                           <div className="p-2">
                             {/* Render QR Code for current URL */}
-                            <CurrentUrlQRCode size={260} />
+                            <CurrentUrlQRCode size={260}/>
                           </div>
                         </DialogContent>
                       </Dialog>
@@ -782,10 +802,10 @@ export default function Article({
                       <button type="button" onClick={(e) => { e.stopPropagation(); reactToPrintFn(); }} className="hover:underline cursor-pointer w-full text-left">
                         <div className="size- flex justify-start items-center gap-1.5">
                           <div data-svg-wrapper data-property-1="Print" className="relative">
-                            <Printer className="text-gray-500" size={16} />
+                            <Printer className="text-gray-500 dark:text-neutral-400" size={16} />
                           </div>
                           <div className="size- pr-1.5 flex justify-start items-center gap-2.5 overflow-hidden">
-                            <div className="justify-start text-gray-500 text-sm font-normal leading-normal truncate">{dict.tools.printPage}</div>
+                            <div className="justify-start text-gray-500 dark:text-neutral-400 text-sm font-normal leading-normal truncate">{dict.tools.printPage}</div>
                           </div>
                         </div>
                       </button>
@@ -794,10 +814,10 @@ export default function Article({
                       <a href="#" className="hover:underline">
                         <div className="size- flex justify-start items-center gap-1.5">
                           <div data-svg-wrapper data-property-1="Info" className="relative">
-                            <Info className="text-gray-500" size={16} />
+                            <Info className="text-gray-500 dark:text-neutral-400 " size={16} />
                           </div>
                           <div className="size- pr-1.5 flex justify-start items-center gap-2.5 overflow-hidden">
-                            <div className="justify-start text-gray-500 text-sm font-normal leading-normal truncate">{dict.tools.pageInfo}</div>
+                            <div className="justify-start text-gray-500 dark:text-neutral-400 text-sm font-normal leading-normal truncate">{dict.tools.pageInfo}</div>
                           </div>
                         </div>
                       </a>
@@ -812,7 +832,8 @@ export default function Article({
       {/* END RIGHT SIDEBAR */}
 
       {/* MAIN CONTENT */}
-      <div className="react-to-print-container lg:mx-72 xl:mx-80 2xl:mx-96 px-4 py-2 overflow-x-hidden min-h-screen" ref={printRef}>
+      {/* <div className="react-to-print-container lg:mx-[calc(var(--spacing)*59)] xl:mx-[calc(var(--spacing)*59)] 2xl:mx-96 px-6 py-2 overflow-x-hidden min-h-screen" ref={printRef}> */}
+      <div className="react-to-print-container lg:mx-64 xl:mx-64 2xl:mx-96 px-4 md:px-6 py-2 overflow-x-hidden min-h-screen" ref={printRef}>
         {/* Loading overlay when bias is changing */}
         <LoadingOverlay
           isVisible={isLoadingBias}
@@ -821,7 +842,6 @@ export default function Article({
         {children}
         <AdBanner lang={currentLang} isProUser={session?.user.subscription?.tier === "PRO"} />
       </div>
-
     </div>
   );
 }

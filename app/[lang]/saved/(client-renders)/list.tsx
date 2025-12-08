@@ -197,7 +197,7 @@ export default function Component({ saved }: { saved?: SerializedSaved[] }) {
     })
 
     // Find all children of matching items
-    const childrenIds = new Set<string>()
+    const childrenIds = new Set<string>();
     directMatches.forEach((matchId) => {
       const item = tree.getItems().find((i) => i.getId() === matchId)
       if (item && item.isFolder()) {
@@ -212,7 +212,7 @@ export default function Component({ saved }: { saved?: SerializedSaved[] }) {
           })
         }
 
-        getDescendants(item.getId())
+        getDescendants(item.getId());
       }
     })
 
@@ -325,7 +325,7 @@ export default function Component({ saved }: { saved?: SerializedSaved[] }) {
                 data-visible={isVisible || !searchValue}
                 className="data-[visible=false]:hidden cursor-pointer"
               >
-                <TreeItemLabel>
+                <TreeItemLabel className="dark:bg-neutral-800 dark:hover:bg-neutral-700/50">
                   <span className="flex items-center gap-2 w-full">
                     {isFolder && (
                       <Calendar className="pointer-events-none size-4 text-muted-foreground" />

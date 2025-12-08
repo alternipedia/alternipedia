@@ -24,40 +24,52 @@ enum SubscriptionTier {
 
 model User {
   id              String            @id @default(cuid())
-  name            String?
+  name            String?           @db.VarChar(300)
+  slug            String?           @unique @db.VarChar(100)
   email           String?           @unique
   emailVerified   DateTime?
   image           String?
   accounts        Account[]
   sessions        Session[]
+
+  // user roles
   role            UserRole          @default(USER)
   adminOfLang     Language?
+  moderatedBias   ModeratorBias? @relation("ModeratorBiasUser") // Bias this user moderates (one bias)
+  assignedModeratorBias ModeratorBias[] @relation("ModeratorBiasAssignedByAdmin") // Biases this user assigned as moderator
 
+  // articles
+  threadsAuthored Thread[] 
+  threadComments      ThreadComment[]
+  threadCommentLikes  ThreadCommentLikes[]
   blocks          Block[]
   addedCategories ArticleCategory[] // categories this user added
   watching        ArticleWatcher[]  // articles this user watches
   savedArticles   SavedArticle[] // articles this user saved
-  moderatedBias   ModeratorBias? @relation("ModeratorBiasUser") // Bias this user moderates (one bias)
-  assignedModeratorBias ModeratorBias[] @relation("ModeratorBiasAssignedBy") // Biases this user assigned as moderator
-  biasBans        BiasBan[]         // 🚫 bans received
-  issuedBans      BiasBan[]         @relation("BiasBanModerator") // 🧑‍⚖️ bans given (mods)
+
+  // wiki interactions
+  biasBans        Ban[]   @relation("BansReceived")      // 🚫 bans received
+  issuedBans      Ban[]         @relation("BansIssued") // 🧑‍⚖️ bans given (mods)
   votes           RevisionVote[]
   notes           Note[]
-  uploadedBlobs   UploadedBlobs[]
+  uploadedBlobs   Blob[]
   feedbacks       Feedback[]
+  reportsSent     Reports[]
+  viewed          PageView[]
 
+  // wiki settings
   currentEditableBias   Bias?    @relation(fields: [currentEditableBiasId], references: [id])
   currentEditableBiasId Int?
   currentEditableBiasChangedAt DateTime?
+  emailNotifications    Boolean          @default(true)
+  pushNotifications     Boolean          @default(true)
 
+  // subscriptions
   subscriptionTier      SubscriptionTier @default(FREE)
   subscriptionStartedAt DateTime?
   subscriptionHistory   Subscription[]
   subscriptionExpiresAt DateTime?
   stripeCustomerId      String?
-
-  emailNotifications    Boolean          @default(true)
-  pushNotifications     Boolean          @default(true)
 
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
@@ -71,9 +83,16 @@ model ModeratorBias {
 
   bias      Bias     @relation(fields: [biasId], references: [id])
   biasId    Int
+  
+  language  Language
 
-  assignedBy User   @relation("ModeratorBiasAssignedBy", fields: [assignedByAdminId], references: [id])
+  assignedBy User   @relation("ModeratorBiasAssignedByAdmin", fields: [assignedByAdminId], references: [id])
   assignedByAdminId String
+
+  revisionLawViolations Revision[] @relation("ReportedRevisionLawViolations")
+  blobLawViolations Blob[] @relation("UploadedBlobLawViolation")
+  threadLawViolations Thread[] @relation("ThreadLawViolation")
+  threadCommentLawViolations ThreadComment[] @relation("ThreadCommentLawViolation")
 
   assignedAt DateTime @default(now())
 }
@@ -95,7 +114,6 @@ model Subscription {
 
 model Account {
   id                String  @id @default(cuid())
-  userId            String
   type              String
   provider          String
   providerAccountId String
@@ -108,6 +126,7 @@ model Account {
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String
 
   @@unique([provider, providerAccountId])
 }
@@ -129,28 +148,29 @@ model Bias {
   id              Int        @id @default(autoincrement())
   name            String     @unique
   revisions       Revision[]
-  bans            BiasBan[]
+  bans            Ban[]
   moderators      ModeratorBias[]
   editableByUsers User[]
-  uploadedBlobs    UploadedBlobs[]
-
-  ArticleCategory ArticleCategory[]
+  blobs           Blob[]
+  threads         Thread[]
+  categories      ArticleCategory[]
+  views           PageView[]
 }
 
 // TODO: Warning strikes?
-model BiasBan {
+model Ban {
   id           Int       @id @default(autoincrement())
 
-  user         User      @relation(fields: [userEmail], references: [email])
+  user         User      @relation("BansReceived", fields: [userEmail], references: [email])
   userEmail    String 
 
   bias         Bias      @relation(fields: [biasId], references: [id])
   biasId       Int
 
-  bannedBy     User     @relation("BiasBanModerator", fields: [bannedByUserId], references: [id])
+  bannedBy     User     @relation("BansIssued", fields: [bannedByUserId], references: [id])
   bannedByUserId String
 
-  reason       String?
+  reason       String  @db.VarChar(2000)
   
   createdAt    DateTime  @default(now())
   expiresAt    DateTime?
@@ -166,7 +186,7 @@ model Feedback {
 
   language  Language
 
-  content   String @db.VarChar(1000)
+  content   String @db.VarChar(2000)
   createdAt DateTime @default(now())
 }
 
@@ -180,12 +200,138 @@ model Article {
   categories  ArticleCategory[] // explicit join model with metadata
   watchers    ArticleWatcher[]   // who’s watching this article
   savedBy     SavedArticle[] // who's saved this article
+  threads     Thread[] // threads related to this article
+  views       PageView[]
   
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
   
   @@unique([slug, language])
-  @@unique([title, language])
+}
+
+model PageView {
+  id          Int      @id @default(autoincrement())
+
+  article     Article?  @relation(fields: [articleId], references: [id])
+  articleId   Int?
+  revision    Revision?  @relation(fields: [revisionId], references: [id])
+  revisionId  Int?
+  bias        Bias?     @relation(fields: [biasId], references: [id])
+  biasId      Int?
+  uri         String   @db.VarChar(2000)
+
+  viewer        User?     @relation(fields: [viewerId], references: [id])
+  viewerId      String?
+  language      Language?
+
+  ipAddress     String? // store hashed IP for privacy
+  userAgent     String? // store user agent string
+  createdAt     DateTime @default(now())
+}
+
+enum ThreadStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  DUPLICATE
+}
+
+model Thread {
+  id        Int      @id @default(autoincrement())
+
+  article   Article  @relation(fields: [articleId], references: [id])
+  articleId Int
+
+  bias      Bias     @relation(fields: [biasId], references: [id])
+  biasId    Int
+
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId   String
+
+  referencesRevision Revision? @relation("ReferenceRevisionThreads", fields: [referencesRevisionId], references: [id])
+  referencesRevisionId Int?
+
+  violatesLaw Boolean  @default(false)
+  violationSetBy ModeratorBias? @relation("ThreadLawViolation", fields: [violationSetByUserId], references: [id])
+  violationSetByUserId Int?
+
+  status   ThreadStatus @default(OPEN)
+  comments  ThreadComment[]      @relation("ThreadComments")
+  reports Reports[]
+  title   String   @db.VarChar(300)
+  content    String   @db.VarChar(2000)
+  language   Language
+
+  createdAt DateTime @default(now())
+}
+
+enum ReportStatus {
+  PENDING
+  RESOLVED
+  DISMISSED
+}
+
+model Reports {
+  id         Int       @id @default(autoincrement())
+
+  reportedBy      User      @relation(fields: [reportedById], references: [id])
+  reportedById    String
+
+  status    ReportStatus
+  reason    String    @db.VarChar(2000)
+
+  thread    Thread? @relation(fields: [threadId], references: [id])
+  threadId  Int?
+
+  comment   ThreadComment? @relation(fields: [commentId], references: [id])
+  commentId Int?
+
+  revision  Revision?      @relation(fields: [revisionId], references: [id])
+  revisionId Int?
+
+  blob      Blob? @relation(fields: [blobId], references: [id])
+  blobId    Int?
+
+  createdAt DateTime  @default(now())
+
+  @@unique([reportedById, threadId])
+  @@unique([reportedById, commentId])
+  @@unique([reportedById, revisionId])
+  @@unique([reportedById, blobId])
+}
+
+model ThreadComment {
+  id         Int      @id @default(autoincrement())
+
+  thread     Thread @relation("ThreadComments", fields: [threadId], references: [id])
+  threadId   Int
+
+  author     User     @relation(fields: [authorId], references: [id])
+  authorId   String
+
+  likes      ThreadCommentLikes[]
+  content    String   @db.VarChar(2000)
+
+  violatesLaw Boolean  @default(false)
+  violationSetBy ModeratorBias? @relation("ThreadCommentLawViolation", fields: [violationSetByUserId], references: [id])
+  violationSetByUserId Int?
+  reports   Reports[]
+
+  createdAt  DateTime @default(now())
+}
+
+model ThreadCommentLikes {
+  id         Int      @id @default(autoincrement())
+
+  comment    ThreadComment @relation(fields: [commentId], references: [id])
+  commentId  Int
+
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+
+  createdAt  DateTime @default(now())
+
+  @@unique([commentId, userId]) // each user can like a comment once
 }
 
 model Revision {
@@ -196,8 +342,16 @@ model Revision {
   bias            Bias     @relation(fields: [biasId], references: [id])
   biasId          Int
 
+  violatesLaw     Boolean  @default(false)
+
+  violatesLawSetBy ModeratorBias? @relation("ReportedRevisionLawViolations", fields: [violatesLawSetByUserId], references: [id])
+  violatesLawSetByUserId Int?
+
   revisionBlocks  RevisionBlock[] 
   votes           RevisionVote[]
+  threadsReferencing Thread[] @relation("ReferenceRevisionThreads")
+  reports Reports[]
+  views          PageView[]
 
   createdAt       DateTime @default(now())
 }
@@ -246,7 +400,7 @@ model RevisionVote {
   @@unique([revisionId, userId]) // each user can vote once per revision
 }
 
-model UploadedBlobs {
+model Blob {
   id        Int      @id @default(autoincrement())
   url       String   @unique
 
@@ -257,6 +411,11 @@ model UploadedBlobs {
 
   uploadedBy User    @relation(fields: [uploadedByUserId], references: [id])
   uploadedByUserId String
+
+  violatesLaw Boolean  @default(false)
+  violatesLawSetBy ModeratorBias? @relation("UploadedBlobLawViolation", fields: [violatesLawSetByUserId], references: [id])
+  violatesLawSetByUserId Int?
+  reports Reports[]
 
   uploadedAt DateTime @default(now())
 }

@@ -3,5 +3,5 @@ export default async function SettingsLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="min-h-96 bg-background">{children}</div>;
+  return <div className="min-h-96">{children}</div>;
 }

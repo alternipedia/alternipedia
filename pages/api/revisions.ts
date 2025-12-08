@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/prisma";
 import { withRetry } from '@/lib/retry';
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
 // GET /api/revisions?slug=Some_slug&lang=en&bias=socialist
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -38,7 +40,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(200).json({ revisions: [] });
     }
 
-    // Query revisions for this article+bias and aggregate star counts
+    // Determine current user (if any) so we can mark which revisions they starred.
+    const session = await getServerSession(req, res, authOptions as any)
+    const s = session as any
+    let currentUserId: string | null = null
+    if (s?.user?.email) {
+      const dbUser = await withRetry(() => prisma.user.findUnique({ where: { email: s.user.email }, select: { id: true } }))
+      if (dbUser) currentUserId = dbUser.id
+    }
+
+    // Query revisions for this article+bias and aggregate star counts. Also select voter userIds
     const revisions = await withRetry(() => prisma.revision.findMany({
       where: {
         articleId: article.id,
@@ -47,7 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       orderBy: { createdAt: 'desc' },
       include: {
         votes: {
-          select: { value: true },
+          select: { value: true, userId: true },
         },
       },
     }));
@@ -56,6 +67,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       id: r.id,
       createdAt: r.createdAt,
       stars: (r.votes || []).reduce((s, v) => s + (v?.value || 0), 0),
+      starred: currentUserId ? !!(r.votes || []).find((v) => v.userId === currentUserId) : false,
+      violatesLaw: !!r.violatesLaw,
     }));
 
     return res.status(200).json({ revisions: mapped });

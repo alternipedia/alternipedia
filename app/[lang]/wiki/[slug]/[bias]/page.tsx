@@ -10,7 +10,6 @@ import { prisma } from "@/lib/prisma";
 import { BlockType, Language } from "@prisma/client";
 import { fetchWikipediaPageWithWtf } from "@/lib/wikipedia-api";
 import { withRetry } from "@/lib/retry";
-import { load } from "cheerio";
 
 export async function generateMetadata({
   params,
@@ -24,22 +23,34 @@ export async function generateMetadata({
   const bias = p.bias;
   const dict = getDictionary(lang as Locale);
   let description;
+  let fixedSlug = decodeURIComponent(slug.replaceAll('_', ' '));
 
   if (bias === 'wikipedia') {
-    description = `${dict.metadata.wikipedia.part1} ${decodeURIComponent(slug.replaceAll('_', ' '))} ${dict.metadata.wikipedia.part2}`;
+    description = `${dict.metadata.wikipedia.part1} ${fixedSlug} ${dict.metadata.wikipedia.part2}`;
   } else if (bias === 'socialist') {
-    description = `${dict.metadata.socialist.part1} ${decodeURIComponent(slug.replaceAll('_', ' '))} ${dict.metadata.socialist.part2}`;
+    description = `${dict.metadata.socialist.part1} ${fixedSlug} ${dict.metadata.socialist.part2}`;
   } else if (bias === 'liberal') {
-    description = `${dict.metadata.liberal.part1} ${decodeURIComponent(slug.replaceAll('_', ' '))} ${dict.metadata.liberal.part2}`;
+    description = `${dict.metadata.liberal.part1} ${fixedSlug} ${dict.metadata.liberal.part2}`;
   } else if (bias === 'conservative') {
-    description = `${dict.metadata.conservative.part1} ${decodeURIComponent(slug.replaceAll('_', ' '))} ${dict.metadata.conservative.part2}`;
+    description = `${dict.metadata.conservative.part1} ${fixedSlug} ${dict.metadata.conservative.part2}`;
   } else if (bias === 'nationalist') {
-    description = `${dict.metadata.nationalist.part1} ${decodeURIComponent(slug.replaceAll('_', ' '))} ${dict.metadata.nationalist.part2}`;
+    description = `${dict.metadata.nationalist.part1} ${fixedSlug} ${dict.metadata.nationalist.part2}`;
   }
 
   return {
     title: "Alternipedia | " + description,
     description: dict.metadata.description,
+    keywords: [
+      "alternipedia",
+      "alternative wikipedia",
+      "multiple perspectives",
+      "bias",
+      "politics",
+      "encyclopedia",
+      "grokipedia",
+      "wikipedia alternative",
+      fixedSlug
+    ],
   };
 }
 
@@ -57,8 +68,6 @@ export default async function Page({
 
   let mappedRevision: any = {};
   let wikipediaData: any = {};
-  let wikipediaJson: any = {};
-  let wikipediaHtml = '';
 
   if (bias === 'wikipedia') {
     const imageToJSON = (rawData: any) => {
@@ -168,114 +177,6 @@ export default async function Page({
         };
 
         wikipediaData = JSON.parse(JSON.stringify(wikipediaData));
-
-        const params = new URLSearchParams({
-          action: "parse",
-          page: wikipediaData.title,
-          prop: 'text',
-          formatversion: '2',
-          format: "json",
-          // include origin=* so the API returns CORS-friendly responses when needed
-          origin: '*',
-        });
-
-        const url = `https://${lang}.wikipedia.org/w/api.php?${params}`;
-
-        // Use a descriptive User-Agent; Wikimedia asks for a descriptive UA for automated requests.
-        const userAgent = process.env.WIKIPEDIA_USER_AGENT || 'Alternipedia/1.0 (+https://alternipedia.org)';
-
-        const response = await fetch(url, {
-          headers: {
-            Accept: 'application/json',
-            'User-Agent': userAgent,
-          },
-        });
-
-        const contentType = response.headers.get('content-type') || '';
-
-        if (!response.ok) {
-          const body = await response.text();
-          console.error(`Wikipedia API returned ${response.status} ${response.statusText} for ${url}:`, body.slice(0, 800));
-          throw new Error(`Wikipedia API error ${response.status} ${response.statusText}`);
-        }
-
-        if (!contentType.includes('application/json')) {
-          const body = await response.text();
-          console.error(`Unexpected Content-Type from Wikipedia API (${contentType}) for ${url}:`, body.slice(0, 800));
-          throw new Error(`Expected JSON from Wikipedia API but got ${contentType}`);
-        }
-
-        wikipediaJson = await response.json();
-
-        if (wikipediaJson) {
-          const $ = load(wikipediaJson.parse.text);
-          $('.infobox').addClass('flex justify-center md:float-right m-6');
-          $('.mw-editsection').remove();
-          $('.sistersitebox').remove();
-          $('.mw-image-border').remove();
-          $('h2').addClass('text-2xl font-bold mt-8 mb-4');
-          $('h3').addClass('text-xl font-semibold mt-6 mb-3');
-          $('h4').addClass('text-lg font-semibold mt-4 mb-2');
-          $('figure img').addClass('rounded-md shadow-sm');
-          $('figure video').addClass('rounded-md shadow-sm');
-          $('table.infobox').addClass('border border-gray-300 dark:border-gray-600 p-2 rounded-lg m-2 p-2 !border-separate');
-          $('.hatnote').addClass('mb-1 text-center !px-0');
-          $('.skin-invert-image').remove();
-          $('.box-More_citations_needed').remove();
-          $('.tright').addClass('float-right m-2 border border-gray-300 dark:border-gray-600 p-1 bg-gray-100 dark:bg-gray-800 rounded-md border-separate justify-space-between text-center margin-auto');
-          $('.thumb .thumbcaption').addClass('!text-center !justify-center !m-auto');
-          $('figure').addClass('flex flex-col max-w-[20vw] float-right clear-both m-4');
-          $('figure img').addClass('m-auto');
-          $('figure figcaption').addClass('text-center text-sm mb-2');
-          $('div.thumbinner.multiimageinner')
-            .filter(function () {
-              return $(this).find('img').length > 3;
-            })
-            .addClass('gap-8');
-          $('.clade-gallery').addClass('w-full !hidden md:!block');
-          $('ul > li > span.noviewer.sister-inline-image').addClass('hidden');
-          $('td.cladogram > div.clade > table.clade').addClass('!w-full');
-          $('div.clade-gallery div.main-content').removeClass('main-content');
-          $('table').addClass('w-full table-auto mb-4 border-gray-200 border border-separate rounded-lg px-6 py-1');
-          $('table.infobox').removeClass('text-left font-semibold border-b border-gray-300 dark:border-gray-600 px-4 py-2 m-6');
-          $('table th').addClass('text-left font-semibold border-b border-gray-300 dark:border-gray-600 px-4 py-2');
-          $('table.sidebar th').removeClass('text-left').addClass('text-center');
-          $('table.infobox th').removeClass('text-left border-b border-gray-300 dark:border-gray-600 px-4 py-2').addClass('align-top');
-          $('table.navbox-subgroup').removeClass('text-left font-semibold border-b border-gray-300 dark:border-gray-600 px-4 py-2 w-full table-auto mb-4 border-gray-200 border border-separate rounded-lg px-6 py-1');
-          $('table.nowraplinks.hlist').removeClass('text-left font-semibold border-b border-gray-300 dark:border-gray-600 px-4 py-2 w-full table-auto mb-4 border-gray-200 border border-separate rounded-lg px-6 py-1');
-          $('div.navbox > table').removeClass('text-left font-semibold border-b border-gray-300 dark:border-gray-600 px-4 py-2 w-full table-auto mb-4 border-gray-200 border border-separate rounded-lg px-6 py-1');
-          $('td.infobox-image').addClass('flex flex-col');
-          $('table.clade').removeClass('text-left font-semibold border-b border-gray-300 dark:border-gray-600 px-4 py-2 table-auto mb-4 border-gray-200 border border-separate rounded-lg px-6 py-1');
-          $('table.gallery-element').removeClass('text-left font-semibold border-b border-gray-300 dark:border-gray-600 px-4 py-2 table-auto mb-4 border-gray-200 border border-separate rounded-lg px-6 py-1');
-          $('table.gallery-element th').removeClass('text-left border-b border-gray-300 dark:border-gray-600 px-4');
-          $('table tbody').addClass('p-2 m-2');
-          $('ol').addClass('list-decimal ml-6');
-          $('ol li').addClass('ml-6');
-          $('div.sidebar-list-title').addClass('!text-center');
-          $('.sidebar-below img').addClass('hidden');
-          $('ul').addClass('list-disc ml-6');
-          $('ul li').addClass('ml-6');  
-          $('.infobox-data > ul.list-disc.ml-6 > li.ml-6').removeClass('ml-6').addClass('ml-2');
-          $('.infobox-data > ul.list-disc.ml-6').removeClass('ml-6');
-          $('.reflist').addClass('mx-6 md:mx-12');
-          $('table.infobox').removeClass('w-full');
-          $('table.infobox').removeAttr('style');
-          $('.spoken-wikipedia').remove();
-          // $('.mw-parser-output .sidebar');
-          $("a").each((i, el) => {
-            const href = $(el).attr("href");
-            const text = $(el).text();
-
-            if (href) {
-              // Example: modify internal Wikipedia links
-              if (href.startsWith("/wiki/")) {
-                let newLink = `/${lang}${href}/wikipedia`;
-                $(el).attr("href", newLink);
-              }
-            }
-          });
-          wikipediaHtml = $.html();
-        }
       }
     } catch (error) {
       console.error('Error fetching Wikipedia page:', error);
@@ -373,6 +274,13 @@ export default async function Page({
       })),
     } : null;
 
+    // If the chosen revision is marked as violating law, keep a flag and
+    // avoid exposing the revision blocks to the reader. This lets the UI
+    // show a blocked/forbidden message instead of rendering content.
+    if (mappedRevision && mappedRevision.violatesLaw) {
+      mappedRevision.revisionBlocks = [];
+    }
+
     if (!mappedRevision) {
       mappedRevision = {
         id: null,
@@ -385,27 +293,13 @@ export default async function Page({
 
   return (
     <div>
-      <span>
-        {bias === 'socialist' && (
-          <WikiTabs revision={mappedRevision} slug={slug} lang={lang} bias={bias} />
-        )}
+      {bias !== 'wikipedia' && (
+        <WikiTabs revision={mappedRevision} slug={slug} lang={lang} bias={bias} />
+      )}
 
-        {bias === 'liberal' && (
-          <WikiTabs revision={mappedRevision} slug={slug} lang={lang} bias={bias} />
-        )}
-
-        {bias === 'wikipedia' && (
-          <WikiTabs slug={slug} lang={lang} bias={bias} wikipediaData={wikipediaData} wikipediaHtml={wikipediaHtml} />
-        )}
-
-        {bias === 'conservative' && (
-          <WikiTabs revision={mappedRevision} slug={slug} lang={lang} bias={bias} />
-        )}
-
-        {bias === 'nationalist' && (
-          <WikiTabs revision={mappedRevision} slug={slug} lang={lang} bias={bias} />
-        )}
-      </span>
+      {bias === 'wikipedia' && (
+        <WikiTabs slug={slug} lang={lang} bias={bias} wikipediaData={wikipediaData} />
+      )}
 
       <BottomTools />
       <BottomArrow />

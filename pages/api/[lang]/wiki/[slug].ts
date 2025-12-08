@@ -139,7 +139,7 @@ export default async function handler(
       return res.status(401).json({ error: "User not found" });
     }
 
-    const banned = await withRetry(() => prisma.biasBan.findFirst({
+    const banned = await withRetry(() => prisma.ban.findFirst({
       where: {
         biasId: biasDb.id,
         userEmail: user.email || '',
@@ -160,7 +160,7 @@ export default async function handler(
     if (user.role === "ADMIN" && user.adminOfLang === lang.toUpperCase() as Language) {
       allowEdit = true;
     }
-    if (user.moderatedBias?.id === biasDb.id) {
+    if (user.moderatedBias?.id === biasDb.id && user.moderatedBias.language === lang.toUpperCase() as Language) {
       allowEdit = true;
     }
     if (user.currentEditableBiasId === biasDb.id ) {

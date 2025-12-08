@@ -10,7 +10,6 @@ export default function robots(): MetadataRoute.Robots {
       disallow: [
         '/*/wiki/*/wikipedia',
         "/api/",
-        "/_next/",
       ],
       allow: ['/'],
     },

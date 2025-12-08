@@ -39,12 +39,13 @@ export default function AdBanner({ lang, isProUser = false }: AdBannerProps) {
 
   if (isProUser) return null;
 
-  if (isAdBlocked)
+  if (isAdBlocked) {
     return (
       <div id="ad" className="bg-yellow-100 border border-yellow-300 p-3 rounded-lg text-sm text-gray-700 text-center my-2">
         🙈 {dict.blockedAd.part1} <a href={`/${lang}/upgrade`} className="underline">{dict.blockedAd.part2}</a> {dict.blockedAd.part3}
       </div>
     );
+  }
 
   return (
     <ins
@@ -53,7 +54,7 @@ export default function AdBanner({ lang, isProUser = false }: AdBannerProps) {
       className="adsbygoogle my-2"
       style={{ display: "block" }}
       data-ad-client="ca-pub-7936619142942349"
-      data-ad-slot="7132626421"
+      data-ad-slot="3304896788"
       data-ad-format="auto"
       data-full-width-responsive="true"></ins>
   );

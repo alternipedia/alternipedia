@@ -3,6 +3,14 @@
 import { useState } from "react";
 import { Button } from "@/app/(components)/ui/button";
 import { Input } from "@/app/(components)/ui/input";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/app/(components)/ui/card";
 import { useParams } from "next/navigation";
 
 export default function DonatePage() {
@@ -11,12 +19,8 @@ export default function DonatePage() {
   const params = useParams();
   const lang = params?.lang as string;
 
-  const presets = [
-    { amount: 5, price_id: 'price_1SK5eG4HdUbnAvC55fBpI47p' },
-    { amount: 10, price_id: 'price_1SK5fM4HdUbnAvC5Tw99tR5P' },
-    { amount: 50, price_id: 'price_1SK5fM4HdUbnAvC5dKVmn0Cp' },
-    { amount: 100, price_id: 'price_1SK5fM4HdUbnAvC5K28Ntg1B' },
-  ];
+  // Only show a single $5 preset to keep UI minimal
+  const presets = [{ amount: 5, price_id: 'price_1SK5eG4HdUbnAvC55fBpI47p' }];
 
   const handleDonate = async (price_id?: string, customAmountCents?: number) => {
     setLoading(true);
@@ -65,39 +69,58 @@ export default function DonatePage() {
   };
 
   return (
-    <div className="flex flex-col items-center mt-10 mb-10">
-      <h1 className="text-3xl font-bold mb-6">Support Our Mission 💚</h1>
-      <p className="max-w-xl text-center mb-8">
-        Your donation helps us continue providing free resources and education.
-      </p>
+    <div className="flex justify-center mt-10 mb-10 px-4">
+      <Card className="w-full max-w-lg">
+        <CardHeader>
+          <CardTitle>Support Our Mission 💚</CardTitle>
+          <CardDescription>
+            Your donation helps us continue providing free resources. Thank you for your
+            support.
+          </CardDescription>
+        </CardHeader>
 
-      <div className="flex flex-col items-center gap-4">
-        <div className="flex gap-4">
-          {presets.map((item) => (
-            <Button
-              key={item.amount}
-              onClick={() => handleDonate(item.price_id)}
-              disabled={loading}
-              className="cursor-pointer"
-            >
-              Donate ${item.amount}
-            </Button>
-          ))}
-        </div>
+        <CardContent>
+          <div className="flex flex-col gap-4">
+            {presets.map((item) => (
+              <Button
+                key={item.amount}
+                onClick={() => handleDonate(item.price_id)}
+                disabled={loading}
+                size="lg"
+                className="w-full cursor-pointer"
+              >
+                {loading ? "Processing..." : `Donate $${item.amount}`}
+              </Button>
+            ))}
 
-        <div className="flex items-center gap-2 mt-4">
-          <Input
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="Other amount (USD)"
-            className="w-40"
-            inputMode="decimal"
-          />
-          <Button onClick={handleCustomDonate} disabled={loading}>
-            Donate custom
-          </Button>
-        </div>
-      </div>
+            <div className="flex items-center gap-2">
+              <Input
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="Custom amount (USD)"
+                className="min-w-0 flex-1"
+                inputMode="decimal"
+                aria-label="Custom donation amount in USD"
+              />
+              <Button
+                onClick={handleCustomDonate}
+                disabled={loading}
+                variant="outline"
+                className="cursor-pointer"
+              >
+                Donate
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+
+        <CardFooter>
+          <p className="text-sm text-muted-foreground">
+            Secure payment processed by Stripe. You will be redirected to
+            complete your donation.
+          </p>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

@@ -73,12 +73,12 @@ export default function Search() {
   })
 
   return (
-    <div className="*:not-first:mt-2 w-full max-w-2xl px-2.5 py-1.5 mx-1 md:mx-4">
+    <div className="*:not-first:mt-2 w-full px-2.5 py-1.5 mx-1 md:mx-4">
       <div className="relative" ref={containerRef}>
         <Input
           ref={inputRef}
           id={id}
-          className="peer ps-9 pe-9 bg-gray-100 text-gray-400"
+          className="peer ps-9 pe-9 bg-gray-100 text-gray-400 dark:bg-neutral-800 dark:text-gray-300 focus:bg-white focus:dark:bg-neutral-700 w-full"
           placeholder={dict.common.searchPlaceholder}
           type="search"
           value={inputValue}
@@ -112,7 +112,7 @@ export default function Search() {
             id="search-suggestions"
             role="listbox"
             aria-label="Search suggestions"
-            className="absolute z-50 mt-1 w-full max-h-60 overflow-auto rounded-md border bg-background py-1 text-sm shadow-lg"
+            className="absolute z-50 mt-1 w-full max-h-60 overflow-auto rounded-md border bg-background dark:bg-neutral-800 text-sm shadow-lg"
           >
             {results.map((r, idx) => (
               <li
@@ -126,7 +126,7 @@ export default function Search() {
                   inputRef.current?.blur()
                   window.dispatchEvent(new CustomEvent('unload-signal'));
                 }}
-                className={`px-3 hover:bg-gray-100 py-2 cursor-pointer text-foreground`}
+                className={`px-3 hover:bg-gray-100 hover:dark:bg-neutral-700 first:pb-2 last:pt-2 py-2 cursor-pointer text-foreground`}
               >
                 {r.title}
               </li>

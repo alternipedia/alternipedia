@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import './bottom-arrow.css';
+import './bottom-arrow.module.css';
 
 export default function BottomArrow() {
   const [bottomOffset, setBottomOffset] = useState("bottom-8"); // default for large

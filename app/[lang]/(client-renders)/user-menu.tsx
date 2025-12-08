@@ -55,7 +55,7 @@ export default function UserMenu({ lang }: { lang: Locale }) {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild
-        className="px-4 py-2 rounded-md bg-white hover:bg-gray-100 data-[state=open]:bg-gray-200 transition-all">
+        className="px-4 py-2 rounded-mdtransition-all">
         <Button size="icon"
           aria-label="Open account menu"
           variant="ghost"
@@ -63,7 +63,7 @@ export default function UserMenu({ lang }: { lang: Locale }) {
           <CircleUserRoundIcon size={16} aria-hidden="true" className="scale-120" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="max-w-64" collisionPadding={8}>
+      <DropdownMenuContent className="max-w-64 dark:!bg-neutral-800" collisionPadding={8}>
 
         {status === "loading" && (
           <DropdownMenuLabel className="flex items-center gap-3 text-ellipsis">
@@ -98,33 +98,33 @@ export default function UserMenu({ lang }: { lang: Locale }) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem className="cursor-pointer" onClick={() => router.push(`/${lang}/saved`)}>
+              <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700" onClick={() => router.push(`/${lang}/saved`)}>
                 <BookMarked size={16} className="opacity-60" aria-hidden="true" />
                 <span>{dict.userMenu.savedArticles}</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">
+              <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700">
                 <MessageSquarePlus size={16} className="opacity-60" aria-hidden="true" />
                 <span>{dict.userMenu.contributions}</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer" onClick={() => router.push(`/${lang}/settings`)}>
+              <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700" onClick={() => router.push(`/${lang}/settings`)}>
                 <Settings size={16} className="opacity-60" aria-hidden="true" />
                 <span>{dict.userMenu.preferences}</span>
               </DropdownMenuItem>
               {session.user.moderatedBias?.id && (
-                <DropdownMenuItem className="cursor-pointer" onClick={() => router.push(`/${lang}/settings`)}>
+                <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700" onClick={() => router.push(`/${lang}/settings`)}>
                   <Gavel size={16} className="opacity-60" aria-hidden="true" />
                   <span>Moderator panel</span>
                 </DropdownMenuItem>
               )}
               {(session.user.role === "ADMIN" || session.user.role === "GLOBAL_ADMIN") && (
-                <DropdownMenuItem className="cursor-pointer" onClick={() => router.push(`/${lang}/admin`)}>
+                <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700" onClick={() => router.push(`/${lang}/admin`)}>
                   <ShieldUser size={16} className="opacity-60" aria-hidden="true" />
                   <span>Admin panel</span>
                 </DropdownMenuItem>
               )}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer" onClick={() => signOut()}>
+            <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700" onClick={() => signOut()}>
               <LogOutIcon size={16} className="opacity-60" aria-hidden="true" />
               <span>{dict.userMenu.logout}</span>
             </DropdownMenuItem>
@@ -134,12 +134,12 @@ export default function UserMenu({ lang }: { lang: Locale }) {
           <DropdownMenuGroup>
             <Dialog>
               <DialogTrigger asChild>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer dark:hover:bg-neutral-700">
                   <KeyRound size={16} className="opacity-60" aria-hidden="true" />
                   <span>{dict.userMenu.login}</span>
                 </DropdownMenuItem>
               </DialogTrigger>
-              <DialogContent allowAutoFocus={false}>
+              <DialogContent allowAutoFocus={false} className="dark:bg-neutral-900">
                 <div className="flex flex-col items-center gap-2">
                   <ScanFace size={52} />
                   <DialogHeader>
@@ -149,7 +149,7 @@ export default function UserMenu({ lang }: { lang: Locale }) {
                   </DialogHeader>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <Button className="bg-[#DB4437] text-white after:flex-1 hover:bg-[#DB4437]/90 cursor-pointer" onClick={() => signIn("google")}>
+                  <Button className="bg-[#DB4437] text-white after:flex-1 hover:bg-[#DB4437]/85 cursor-pointer" onClick={() => signIn("google")}>
                     <span className="pointer-events-none me-2 flex-1">
                       <RiGoogleFill className="opacity-60" size={16} aria-hidden="true" />
                     </span>
@@ -161,13 +161,13 @@ export default function UserMenu({ lang }: { lang: Locale }) {
                     </span>
                     {dict.login.x}
                   </Button> */}
-                  <Button className="bg-[#1877f2] text-white after:flex-1 hover:bg-[#1877f2]/90 cursor-pointer" onClick={() => signIn("facebook")}>
+                  <Button className="bg-[#1877f2] text-white after:flex-1 hover:bg-[#1877f2]/85 cursor-pointer" onClick={() => signIn("facebook")}>
                     <span className="pointer-events-none me-2 flex-1">
                       <RiFacebookFill className="opacity-60" size={16} aria-hidden="true" />
                     </span>
                     {dict.login.facebook}
                   </Button>
-                  <Button className="bg-[#333333] text-white after:flex-1 hover:bg-[#333333]/90 cursor-pointer" onClick={() => signIn("azure-ad")}>
+                  <Button className="bg-[#333333] text-white after:flex-1 hover:bg-[#333333]/85 cursor-pointer" onClick={() => signIn("azure-ad")}>
                     <span className="pointer-events-none me-2 flex-1">
                       <RiMicrosoftFill className="opacity-60" size={16} aria-hidden="true" />
                     </span>

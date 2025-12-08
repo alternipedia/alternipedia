@@ -16,92 +16,61 @@ async function detectAdBlock(timeout = 1500): Promise<boolean> {
         // ignore cleanup errors
       }
     };
-    // wrap DOM/network checks in try/catch because some sandboxed browsers
-    // (AdSense preview, crawlers, etc.) may have odd DOM implementations
-    // or restrict APIs which can cause synchronous exceptions.
-    try {
-      if (typeof window === "undefined" || !document || !document.body) {
-        // Not in a browser-like environment — assume not blocked.
-        resolve(false);
-        return;
-      }
 
-      // 1. DOM check
-      const fakeAd = document.createElement("div");
-      fakeAd.className = "adsbygoogle";
-      // keep it present but unobtrusive so page CSS can still apply
-      fakeAd.style.width = "1px";
-      fakeAd.style.height = "1px";
-      fakeAd.style.position = "absolute";
-      fakeAd.style.left = "-9999px";
-      fakeAd.style.top = "0";
-      document.body.appendChild(fakeAd);
+    // 1. DOM check
+    const fakeAd = document.createElement("div");
+    fakeAd.className = "adsbygoogle";
+    // keep it present but unobtrusive so page CSS can still apply
+    fakeAd.style.width = "1px";
+    fakeAd.style.height = "1px";
+    fakeAd.style.position = "absolute";
+    fakeAd.style.left = "-9999px";
+    fakeAd.style.top = "0";
+    document.body.appendChild(fakeAd);
 
-      // allow the browser one frame to apply computed styles
-      requestAnimationFrame(() => {
-        try {
-          const computed = window.getComputedStyle(fakeAd);
-          const rectsEmpty = fakeAd.getClientRects().length === 0;
-          const offsetHidden = fakeAd.offsetParent === null || fakeAd.offsetHeight === 0;
-          const domRemoved = !document.body.contains(fakeAd);
-          // consider hidden if removed or definitely zero-sized/hidden via CSS
-          const domHidden = domRemoved || rectsEmpty || offsetHidden || computed.display === "none" || computed.visibility === "hidden";
+    // allow the browser one frame to apply computed styles
+    requestAnimationFrame(() => {
+      const computed = window.getComputedStyle(fakeAd);
+      const rectsEmpty = fakeAd.getClientRects().length === 0;
+      const offsetHidden = fakeAd.offsetParent === null || fakeAd.offsetHeight === 0;
+      const domRemoved = !document.body.contains(fakeAd);
+      // consider hidden if removed or definitely zero-sized/hidden via CSS
+      const domHidden = domRemoved || rectsEmpty || offsetHidden || computed.display === "none" || computed.visibility === "hidden";
 
-          // 2. Network check
-          const script = document.createElement("script");
-          let timer: number | undefined;
+      // 2. Network check
+      const script = document.createElement("script");
+      let timer: number | undefined;
 
-          const onDone = (result: boolean) => {
-            if (resolved) return;
-            resolved = true;
-            cleanup(fakeAd, script);
-            if (timer) window.clearTimeout(timer);
-            resolve(result);
-          };
+      const onDone = (result: boolean) => {
+        if (resolved) return;
+        resolved = true;
+        cleanup(fakeAd, script);
+        if (timer) window.clearTimeout(timer);
+        resolve(result);
+      };
 
-          script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
-          script.async = true;
-          script.type = "text/javascript";
+      script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
+      script.async = true;
+      script.type = "text/javascript";
 
-          script.onerror = () => {
-            // network blocked — strong indicator
-            onDone(true);
-          };
-          script.onload = () => {
-            // script loaded successfully — less likely to be blocked. Only treat as blocked
-            // if the fake ad element was removed from the DOM entirely (strong signal).
-            onDone(domRemoved);
-          };
+      script.onerror = () => {
+        // network blocked — strong indicator
+        onDone(true);
+      };
+      script.onload = () => {
+        // script loaded successfully — less likely to be blocked. Only treat as blocked
+        // if the fake ad element was removed from the DOM entirely (strong signal).
+        onDone(domRemoved);
+      };
 
-          // append to head if available, otherwise to body
-          try {
-            if (document.head) document.head.appendChild(script);
-            else document.body.appendChild(script);
-          } catch (e) {
-            // appending the script failed — treat as not blocked but clean up
-            console.error("detectAdBlock: failed to append script", e);
-            onDone(false);
-            return;
-          }
+      document.head.appendChild(script);
 
-          // safety timeout: if neither event fires, fall back to DOM-only heuristic
-          timer = window.setTimeout(() => {
-            // be conservative: only report blocked when element was removed from DOM
-            onDone(domRemoved);
-          }, timeout);
-        } catch (inner) {
-          // If anything in the frame callback throws, assume not blocked and resolve
-          console.error("detectAdBlock: frame callback error", inner);
-          cleanup(fakeAd, null);
-          resolve(false);
-        }
-      });
-    } catch (e) {
-      // If any synchronous operation fails, assume not blocked to avoid
-      // causing unhandled exceptions in callers (and to make crawler behavior safe).
-      console.error("detectAdBlock synchronous error:", e);
-      resolve(false);
-    }
+      // safety timeout: if neither event fires, fall back to DOM-only heuristic
+      timer = window.setTimeout(() => {
+        // be conservative: only report blocked when element was removed from DOM
+        onDone(domRemoved);
+      }, timeout);
+    });
   });
 }
 
@@ -112,16 +81,9 @@ export function useAdBlockDetector() {
     let cancelled = false;
     if (typeof window === "undefined") return;
 
-    detectAdBlock()
-      .then((detected) => {
-        if (!cancelled) setIsAdBlocked(detected);
-      })
-      .catch((e) => {
-        // Swallow errors from detection to avoid unhandled promise rejections
-        // in sandboxed environments (AdSense preview, crawlers, etc.)
-        console.error("AdBlock detection failed:", e);
-        if (!cancelled) setIsAdBlocked(false);
-      });
+    detectAdBlock().then((detected) => {
+      if (!cancelled) setIsAdBlocked(detected);
+    });
 
     return () => {
       cancelled = true;
