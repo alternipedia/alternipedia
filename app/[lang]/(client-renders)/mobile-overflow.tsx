@@ -15,12 +15,12 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/app/(components)/ui/dialog";
-import ThemeMenu from "@/app/[lang]/(client-renders)/theme-menu";
 import { Button } from "@/app/(components)/ui/button";
 import { Palette, RectangleEllipsis, Sprout } from "lucide-react";
+import ThemeToggle from "./theme";
+import { getCookie, setCookie } from "cookies-next/client";
 
 export default function MobileOverflow({ lang }: { lang: string }) {
-  const [open, setOpen] = useState(false);
 
   return (
     <div className="flex justify-end m-auto">
@@ -39,12 +39,21 @@ export default function MobileOverflow({ lang }: { lang: string }) {
               // stop propagation and open the dialog after a short delay to avoid race conditions
               e.preventDefault();
               if (e.stopPropagation) e.stopPropagation();
-              setTimeout(() => setOpen(true), 250);
+              const theme = getCookie("alternipedia-theme");
+              if (theme === "dark") {
+                setCookie("alternipedia-theme", "light", { path: '/' });
+                document.documentElement.classList.remove("dark");
+                document.head.querySelector('meta[name="theme-color"]')?.setAttribute("content", "white");
+              } else {
+                setCookie("alternipedia-theme", "dark", { path: '/' });
+                document.documentElement.classList.add("dark");
+                document.head.querySelector('meta[name="theme-color"]')?.setAttribute("content", "black");
+              }
             }}
           >
             <span className="flex items-center gap-2">
               <Palette size={16} className="opacity-60" aria-hidden />
-              <span>Appearance</span>
+              <span>Toggle theme</span>
             </span>
           </DropdownMenuItem>
 
@@ -56,18 +65,6 @@ export default function MobileOverflow({ lang }: { lang: string }) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="dark:bg-neutral-900">
-          <DialogHeader>
-            <DialogTitle>Appearance</DialogTitle>
-            <DialogDescription className="mt-2">Choose a theme</DialogDescription>
-          </DialogHeader>
-          <div className="mt-3">
-            <ThemeMenu />
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

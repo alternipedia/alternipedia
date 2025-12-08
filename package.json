@@ -5,9 +5,8 @@
   "scripts": {
     "dev:ios": "npx cap sync ios && npx cap open ios",
     "dev:android": "npx cap sync android && npx cap open android",
-    "dev:web": "next dev",
+    "dev": "next dev",
     "dev:db": "concurrently -n POSTGRES,STUDIO -c yellow,cyan \"docker-compose up\" \"prisma studio\"",
-    "dev": "concurrently -n POSTGRES,STUDIO,WEB,CLIENT -c yellow,cyan,green,blue \"docker-compose up\" \"prisma studio\" \"next dev\"",
     "migrate:db": "prisma migrate dev --name update-from-npm",
     "build:web": "next build",
     "start:web": "next start",
@@ -67,6 +66,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "color": "^5.0.2",
+    "cookies-next": "^6.1.1",
     "emblor": "^1.4.8",
     "fast-xml-parser": "^5.3.0",
     "framer-motion": "^12.23.24",
