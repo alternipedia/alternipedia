@@ -55,7 +55,7 @@ export default function UserMenu({ lang }: { lang: Locale }) {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild
-        className="px-4 py-2 rounded-mdtransition-all">
+        className="px-4 py-2 rounded-md transition-all">
         <Button size="icon"
           aria-label="Open account menu"
           variant="ghost"

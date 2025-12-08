@@ -34,7 +34,7 @@ export default async function RootLayout({
     ]
   };
   const cookieStore = await cookies();
-  const cookieTheme = cookieStore.get("theme")?.value;
+  const cookieTheme = cookieStore.get("alternipedia-theme")?.value;
   const htmlClass = cookieTheme === "dark" ? "dark" : undefined;
 
   return (

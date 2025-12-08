@@ -43,7 +43,6 @@ import CookieStatement from "./(client-renders)/cookie-statement";
 import Form from "next/form";
 import { prisma } from "@/lib/prisma";
 import { Language } from "@prisma/client";
-import ThemeMenu from "./(client-renders)/theme-menu";
 import DesktopThemeMenu from "./(client-renders)/desktop-theme-menu";
 
 export async function generateMetadata({
@@ -278,7 +277,7 @@ export default async function Layout({
 
               {/* Second Links Column */}
               <div className="flex flex-col gap-1">
-                <a href="https://github.com/svnty/Alternipedia" target="_blank" className="text-blue-400 text-sm font-normal leading-normal hover:underline inline-block w-fit active:underline cursor-pointer">{dict.footer.developers}</a>
+                <a href="https://github.com/alternipedia/alternipedia" target="_blank" className="text-blue-400 text-sm font-normal leading-normal hover:underline inline-block w-fit active:underline cursor-pointer">{dict.footer.developers}</a>
                 <Link href="/" className="text-blue-400 text-sm font-normal leading-normal hover:underline inline-block w-fit active:underline">{dict.footer.statistics}</Link>
                 <CookieStatement lang={lang} />
               </div>
