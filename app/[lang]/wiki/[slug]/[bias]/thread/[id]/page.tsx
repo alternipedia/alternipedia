@@ -81,6 +81,15 @@ export default async function Page({ params }: { params: Promise<{ lang: string;
       <Breadcrumb>
         <BreadcrumbList className="rounded-md border bg-background px-3 py-2 shadow-xs">
           <BreadcrumbItem>
+            <p>
+              {bias === 'socialist' ? "Socialist" : null}
+              {bias === 'conservative' ? "Conservative" : null}
+              {bias === 'liberal' ? "Liberal" : null}
+              {bias === 'nationalist' ? "Nationalist" : null}
+            </p>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
             <BreadcrumbLink asChild>
               <Link href={`/${encodeURIComponent(lang)}/wiki/${encodeURIComponent(slug)}/${encodeURIComponent(bias)}`}>{decodeURIComponent(slug.replaceAll('_', ' '))}</Link>
             </BreadcrumbLink>

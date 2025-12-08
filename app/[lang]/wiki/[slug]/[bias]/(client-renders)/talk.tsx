@@ -25,6 +25,8 @@ type ThreadItem = {
   createdAt?: string
 }
 
+import { ReportDialog } from '@/app/(components)/report-dialog';
+
 export default function Talk({ language, slug, bias }: { language: string; slug: string; bias: string }) {
   const id = useId()
   const params = useParams()
@@ -40,6 +42,10 @@ export default function Talk({ language, slug, bias }: { language: string; slug:
   const [newContent, setNewContent] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+
+  // Reporting state
+  const [reportThreadId, setReportThreadId] = useState<string | null>(null);
+
   const { data: session, status } = useSession();
 
   // Extracted loader so we can call it after creating a thread as well
@@ -114,6 +120,17 @@ export default function Talk({ language, slug, bias }: { language: string; slug:
 
   return (
     <div className="space-y-4">
+      <ReportDialog
+        open={!!reportThreadId}
+        onOpenChange={(open) => !open && setReportThreadId(null)}
+        targetId={reportThreadId || ''}
+        targetType="thread"
+        onSuccess={() => {
+          // Optional: reload threads or show success message
+          setReportThreadId(null);
+        }}
+      />
+
       {loading ? (
         <>
           <Alert>
@@ -260,12 +277,12 @@ export default function Talk({ language, slug, bias }: { language: string; slug:
             </div>
           </div>
 
-          <div className="rounded-md border bg-background">
+          <div className="rounded-md border bg-background dark:bg-neutral-800">
             {paginated.length ? (
               <ul className="divide-y">
                 {paginated.map((t) => (
                   <li key={t.id} className={`w-full ${t.violatesLaw ? 'opacity-40 pointer-events-none' : ''}`}>
-                    <div className="flex items-center gap-4 p-3 hover:bg-slate-50 dark:hover:bg-slate-800">
+                    <div className="flex items-center gap-4 p-3">
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium text-foreground">{t.title}</div>
                         {t.content ? <div className="text-sm text-muted-foreground truncate">{t.content}</div> : null}
@@ -276,7 +293,7 @@ export default function Talk({ language, slug, bias }: { language: string; slug:
                         <TooltipProvider delayDuration={0}>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <button aria-label="Report thread" className="inline-flex h-8 w-8 items-center justify-center rounded hover:bg-mute cursor-pointer">
+                              <button onClick={() => setReportThreadId(t.id)} aria-label="Report thread" className="inline-flex h-8 w-8 items-center justify-center rounded hover:bg-accent cursor-pointer">
                                 <TriangleAlert />
                               </button>
                             </TooltipTrigger>
@@ -288,7 +305,7 @@ export default function Talk({ language, slug, bias }: { language: string; slug:
                           <TooltipProvider delayDuration={0}>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <a href={t.url} aria-label="Open thread" className="inline-flex h-8 w-8 items-center justify-center rounded hover:bg-muted">
+                                <a href={t.url} aria-label="Open thread" className="inline-flex h-8 w-8 items-center justify-center rounded hover:bg-accent">
                                   <ExternalLink />
                                 </a>
                               </TooltipTrigger>

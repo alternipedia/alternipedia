@@ -440,24 +440,24 @@ export default function Article({
     return () => window.removeEventListener("unload-signal", onUnload);
   }, []);
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    params.delete('content');
+  // useEffect(() => {
+  //   const params = new URLSearchParams(window.location.search);
+  //   params.delete('content');
 
-    const newPathSegments = pathname?.split('/');
-    console.log(newPathSegments)
+  //   const newPathSegments = pathname?.split('/');
+  //   console.log(newPathSegments)
 
-    const newPathSegmentsSplitIndex = newPathSegments?.indexOf('thread');
+  //   const newPathSegmentsSplitIndex = newPathSegments?.indexOf('thread');
 
-    if (newPathSegmentsSplitIndex && newPathSegmentsSplitIndex > -1) {
-      newPathSegments?.splice(newPathSegmentsSplitIndex, newPathSegments.length);
-    }
+  //   if (newPathSegmentsSplitIndex && newPathSegmentsSplitIndex > -1) {
+  //     newPathSegments?.splice(newPathSegmentsSplitIndex, newPathSegments.length);
+  //   }
 
-    const newPathname = newPathSegments?.join('/');
-    console.log(newPathname);
+  //   const newPathname = newPathSegments?.join('/');
+  //   console.log(newPathname);
 
-    window.history.replaceState(null, '', `${newPathname}?${params.toString()}`);
-  }, [pathname]);
+  //   window.history.replaceState(null, '', `${newPathname}?${params.toString()}`);
+  // }, [pathname]);
 
   const handleApplyBias = (bias: string, opts?: { replace?: boolean }) => {
     window.dispatchEvent(new CustomEvent('unload-signal'));
@@ -468,6 +468,10 @@ export default function Article({
 
     const slugs = pathname?.split('/') || [];
     slugs[4] = bias; // /[lang]/wiki/[slug]/[bias] -> index 4
+    slugs[5] = '';
+    slugs[6] = '';
+    slugs[7] = '';
+    slugs[8] = '';
     const pathnameOnly = slugs.join('/');
 
     const params = new URLSearchParams(searchParams?.toString());
@@ -793,7 +797,7 @@ export default function Article({
                           </DialogHeader>
                           <div className="p-2">
                             {/* Render QR Code for current URL */}
-                            <CurrentUrlQRCode size={260}/>
+                            <CurrentUrlQRCode size={260} />
                           </div>
                         </DialogContent>
                       </Dialog>

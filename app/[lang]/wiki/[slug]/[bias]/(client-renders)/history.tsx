@@ -31,23 +31,28 @@ type Item = {
   violatesLaw?: boolean
 }
 
+import { ReportDialog } from '@/app/(components)/report-dialog';
+
 export default function HistoryPage() {
   const id = useId();
   const path = usePathname();
   const params = useParams();
   const [pageIndex, setPageIndex] = useState<number>(0)
   const [pageSize, setPageSize] = useState<number>(5)
-  const [sortMode, setSortMode] = useState<'stars'|'recent'>('recent');
+  const [sortMode, setSortMode] = useState<'stars' | 'recent'>('recent');
   const [data, setData] = useState<Item[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [starredMap, setStarredMap] = useState<Record<string, boolean>>({});
   const session = useSession();
 
+  // Reporting state
+  const [reportRevisionId, setReportRevisionId] = useState<string | null>(null);
+
   const handleToggleRemote = useCallback(async (revId: string, isStarred: boolean) => {
     // optimistic update
     setStarredMap((p) => ({ ...p, [revId]: !isStarred }))
-    setData((prev) => prev.map((it) => it.id === revId ? { ...it, stars: isStarred ? Math.max(0, (it.stars ?? 0) - 1) : ((it.stars ?? 0) + 1) } : it ))
+    setData((prev) => prev.map((it) => it.id === revId ? { ...it, stars: isStarred ? Math.max(0, (it.stars ?? 0) - 1) : ((it.stars ?? 0) + 1) } : it))
 
     try {
       if (isStarred) {
@@ -60,7 +65,7 @@ export default function HistoryPage() {
     } catch (e) {
       // revert optimistic update on error
       setStarredMap((p) => ({ ...p, [revId]: isStarred }))
-      setData((prev) => prev.map((it) => it.id === revId ? { ...it, stars: isStarred ? ((it.stars ?? 0) + 1) : Math.max(0, (it.stars ?? 0) - 1) } : it ))
+      setData((prev) => prev.map((it) => it.id === revId ? { ...it, stars: isStarred ? ((it.stars ?? 0) + 1) : Math.max(0, (it.stars ?? 0) - 1) } : it))
       console.error(e)
       // eslint-disable-next-line no-alert
       alert((e as any)?.message || 'Could not toggle star')
@@ -172,6 +177,16 @@ export default function HistoryPage() {
 
   return (
     <div className="space-y-4">
+      <ReportDialog
+        open={!!reportRevisionId}
+        onOpenChange={(open) => !open && setReportRevisionId(null)}
+        targetId={reportRevisionId || ''}
+        targetType="revision"
+        onSuccess={() => {
+          // Optional: reload or show success
+          setReportRevisionId(null);
+        }}
+      />
       {loading ? (
         <div className="text-center text-sm text-muted-foreground">Loading revisions…</div>
       ) : error ? (
@@ -210,7 +225,7 @@ export default function HistoryPage() {
                           <TooltipProvider delayDuration={0}>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <button aria-label="Report revision" className="inline-flex h-8 w-8 items-center justify-center rounded hover:bg-muted cursor-pointer">
+                                <button onClick={() => setReportRevisionId(rev.id)} aria-label="Report revision" className="inline-flex h-8 w-8 items-center justify-center rounded hover:bg-muted cursor-pointer">
                                   <TriangleAlert />
                                 </button>
                               </TooltipTrigger>
