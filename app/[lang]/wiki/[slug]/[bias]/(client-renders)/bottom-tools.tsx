@@ -108,32 +108,32 @@ export default function BottomTools() {
 
   useEffect(() => {
     if (!isSaved) {
-          if (status === "authenticated") {
-      const checkSaved = async () => {
-        try {
-          const rawSlug = Array.isArray(params?.slug) ? params?.slug[0] : params?.slug ?? ''
-          // Normalize: decode any existing percent-encoding, replace underscores with spaces, then re-encode once
-          const normalized = decodeURIComponent(String(rawSlug)).replace(/_/g, ' ')
-          const key = `${normalized}::${currentLang}`
-          // Deduplicate same request (helps avoid double requests from StrictMode / re-renders)
-          if (lastSavedStatusRequest.current === key) return
-          lastSavedStatusRequest.current = key
+      if (status === "authenticated") {
+        const checkSaved = async () => {
+          try {
+            const rawSlug = Array.isArray(params?.slug) ? params?.slug[0] : params?.slug ?? ''
+            // Normalize: decode any existing percent-encoding, replace underscores with spaces, then re-encode once
+            const normalized = decodeURIComponent(String(rawSlug)).replace(/_/g, ' ')
+            const key = `${normalized}::${currentLang}`
+            // Deduplicate same request (helps avoid double requests from StrictMode / re-renders)
+            if (lastSavedStatusRequest.current === key) return
+            lastSavedStatusRequest.current = key
 
-          const res = await fetch(`/api/saved/status?slug=${encodeURIComponent(normalized)}&language=${encodeURIComponent(currentLang)}`, { cache: 'no-store' })
-          if (!res.ok) {
-            // keep default
-            return;
+            const res = await fetch(`/api/saved/status?slug=${encodeURIComponent(normalized)}&language=${encodeURIComponent(currentLang)}`, { cache: 'no-store' })
+            if (!res.ok) {
+              // keep default
+              return;
+            }
+            const json = await res.json()
+            console.log(json);
+            if (typeof json.saved === 'boolean') setIsSaved(json.saved)
+          } catch (e) {
+            // ignore
           }
-          const json = await res.json()
-          console.log(json);
-          if (typeof json.saved === 'boolean') setIsSaved(json.saved)
-        } catch (e) {
-          // ignore
         }
-      }
 
-      checkSaved()
-    }
+        checkSaved()
+      }
     }
   }, [currentLang, params?.slug, status]);
 
@@ -275,7 +275,7 @@ export default function BottomTools() {
         id="fab"
         ref={buttonRef}
         onClick={toggleMenu}
-        className={`fixed right-8 aspect-square bg-gray-800 text-white shadow-sm hover:shadow-lg cursor-pointer lg:hidden z-20 hover:scale-105 justify-content-center flex flex-row items-center transition-transform transform-gpu will-change-transform ${isMenuOpen ? "bg-gray-700" : ""} bottom-[calc(env(safe-area-inset-bottom,0px)+16px)]`}>
+        className={`fixed right-8 aspect-square bg-gray-800 text-white shadow-sm hover:shadow-lg cursor-pointer lg:hidden z-50 hover:scale-105 justify-content-center flex flex-row items-center transition-transform transform-gpu will-change-transform ${isMenuOpen ? "bg-gray-700" : ""} bottom-[calc(env(safe-area-inset-bottom,0px)+16px)]`}>
         {isMenuOpen ? (
           <X className="-ms-1 opacity-60 inline flex-1 text-red-300" aria-hidden="true" />
         ) : (
@@ -297,7 +297,7 @@ export default function BottomTools() {
         <div
           ref={menuRef}
           // className="fixed bottom-18 right-8 bg-gray-800 rounded-lg shadow-xl p-2 z-20 min-w-48 animate-in fade-in slide-in-from-bottom-2 duration-200 block lg:hidden w-[calc(100vw-4rem)] shadow-md"
-          className="fixed right-8 bg-gray-800 rounded-lg p-2 z-20 min-w-48 animate-in fade-in slide-in-from-bottom-2 duration-200 block lg:hidden w-[calc(100vw-4rem)] shadow-md transform-gpu will-change-transform bottom-[calc(env(safe-area-inset-bottom,0px)+68px)]"
+          className="fixed right-8 bg-gray-800 rounded-lg p-2 z-50 min-w-48 animate-in fade-in slide-in-from-bottom-2 duration-200 block lg:hidden w-[calc(100vw-4rem)] shadow-md transform-gpu will-change-transform bottom-[calc(env(safe-area-inset-bottom,0px)+68px)]"
         >
           <div className="flex flex-col gap-1">
 
