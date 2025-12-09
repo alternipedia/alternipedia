@@ -19,7 +19,7 @@ export default function ThemeToggle({ className }: { className?: string }) {
     } else {
       setCookie("alternipedia-theme", "dark", { path: '/' });
       document.documentElement.classList.add("dark");
-      document.head.querySelector('meta[name="theme-color"]')?.setAttribute("content", "black");
+      document.head.querySelector('meta[name="theme-color"]')?.setAttribute("content", "#262626");
     }
   };
 

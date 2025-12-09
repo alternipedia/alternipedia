@@ -87,20 +87,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   $('head').append(`
-    <script>
-window.addEventListener('message', (event) => {
-  // Optional: validate event.origin for security
-  const data = event.data || {};
-  if (data?.type === 'theme') {
-    const html = document.documentElement;
-    if (data.theme === 'dark') html.classList.add('skin-theme-clientpref-night');
-    else html.classList.remove('skin-theme-clientpref-night');
-  }
-}, false);
+  <script>
+  window.addEventListener('message', (event) => {
+    const data = event.data || {};
+    if (data.type === 'theme') {
+      const html = document.documentElement;
+      if (data.theme === 'dark') {
+        html.classList.add('skin-theme-clientpref-night');
+        html.classList.remove('skin-theme-clientpref-day');
+      } else { 
+        html.classList.add('skin-theme-clientpref-day');
+        html.classList.remove('skin-theme-clientpref-night');
+      }
+    }
+  }, false);
 
-// Optionally notify parent it's ready:
-window.parent.postMessage({ type: 'iframe-ready' }, '*');
-</script>
+  // Optionally notify parent it's ready:
+  window.parent.postMessage({ type: 'iframe-ready' }, '*');
+  </script>
     `);
 
   // Keep head for CSS/JS
