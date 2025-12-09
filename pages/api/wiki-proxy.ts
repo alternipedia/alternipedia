@@ -132,24 +132,66 @@ window.parent.postMessage({ type: 'iframe-ready' }, '*');
   $('head').append(`
   <script>
     function sendHeight() {
-      const body = document.getElementById("bodyContentWrapper") || document.body;
-      if (!body) return; // fail-safe
-      const height = body.scrollHeight;
+      // Use the wrapper or fallback to body/documentElement
+      const wrapper = document.getElementById("bodyContentWrapper");
+      const body = document.body;
+      const html = document.documentElement;
+      
+      if (!wrapper && !body) return;
+
+      // Calculate the maximum possible height to ensure we don't cut off content
+      const height = Math.max(
+        wrapper ? wrapper.scrollHeight : 0,
+        wrapper ? wrapper.offsetHeight : 0,
+        body ? body.scrollHeight : 0,
+        body ? body.offsetHeight : 0,
+        html ? html.scrollHeight : 0,
+        html ? html.offsetHeight : 0
+      );
+      
       window.parent.postMessage({ type: "wiki-height", height }, "*");
     }
 
+    // Debounce updates using requestAnimationFrame to prevent message flooding
+    let isScheduled = false;
+    function scheduleSendHeight() {
+      if (isScheduled) return;
+      isScheduled = true;
+      requestAnimationFrame(() => {
+        sendHeight();
+        isScheduled = false;
+      });
+    }
+
     function setupObserver() {
-      const body = document.getElementById("bodyContentWrapper") || document.body;
-      if (!body) return;
+      const wrapper = document.getElementById("bodyContentWrapper");
+      const body = document.body;
+      const html = document.documentElement;
 
-      sendHeight(); // initial height
+      scheduleSendHeight(); // initial height
 
-      // ResizeObserver is better for detecting layout changes (like expanding/collapsing details)
-      const observer = new ResizeObserver(sendHeight);
-      observer.observe(body);
-      
-      // Also listen to image loads which might change height
-      window.addEventListener('load', sendHeight);
+      // Watch for layout changes (CSS transitions, details toggle, etc)
+      const resizeObserver = new ResizeObserver(scheduleSendHeight);
+      if (wrapper) resizeObserver.observe(wrapper);
+      if (body) resizeObserver.observe(body);
+      if (html) resizeObserver.observe(html);
+
+      // Watch for DOM structure changes
+      const mutationObserver = new MutationObserver(scheduleSendHeight);
+      if (body) {
+         mutationObserver.observe(body, { 
+             childList: true, 
+             subtree: true, 
+             attributes: true,
+             attributeFilter: ['style', 'class', 'hidden'] 
+         });
+      }
+
+      // Fallbacks
+      window.addEventListener('load', scheduleSendHeight);
+      window.addEventListener('resize', scheduleSendHeight);
+      // Catch transition ends for smooth collapsible animations
+      document.addEventListener('transitionend', scheduleSendHeight); 
     }
 
     if (document.readyState === 'loading') {
