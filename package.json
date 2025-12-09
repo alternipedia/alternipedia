@@ -72,7 +72,7 @@
     "framer-motion": "^12.23.24",
     "graphql": "^16.11.0",
     "graphql-yoga": "^5.16.0",
-    "happy-dom": "^20.0.2",
+    "happy-dom": "^20.0.11",
     "i": "^0.3.7",
     "install": "^0.13.0",
     "lodash.throttle": "^4.1.1",
