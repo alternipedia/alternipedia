@@ -152,6 +152,9 @@ window.parent.postMessage({ type: 'iframe-ready' }, '*');
       // Ensure we never send 0 if there is content
       if (height === 0 && document.body) height = document.body.scrollHeight;
 
+      // Add a buffer to prevent vertical scrollbars (scrollbar hysteresis or subpixel rendering)
+      if (height > 0) height += 32;
+
       window.parent.postMessage({ type: "wiki-height", height }, "*");
     }
 
@@ -203,12 +206,19 @@ window.parent.postMessage({ type: 'iframe-ready' }, '*');
     }
   </script>
   <style>
+    /* Global box-sizing for consistent sizing */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
     /* Ensure the wrapper captures all content (floats, margins) */
     #bodyContentWrapper {
       display: flow-root; 
       width: 100%;
       height: auto;
-      overflow: hidden; /* Prevent margin collapse and horizontal scroll */
+      overflow-x: auto; /* Allow horizontal scrolling for wide tables/images */
+      overflow-y: visible; /* Ensure vertical content is never clipped */
+      padding: 0 16px; /* Add padding to prevent text touching screen edges */
     }
   </style>
   `);

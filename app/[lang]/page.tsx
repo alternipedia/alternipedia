@@ -11,7 +11,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
   if (!isValidLocale(lang)) {
     notFound();
   }
-  
+
   const SITE_MAP = process.env.NEXTAUTH_URL || 'http://localhost:3000';
   const BASE_URL = `${SITE_MAP}/sitemap.xml`;
 
@@ -23,12 +23,12 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
   const urls = json.urlset.url.filter((url: any) => url.loc.includes(lang));
   const exploreIndex = Math.floor(Math.random() * urls.length);
   const exploreUrl = urls[exploreIndex].loc.split(process.env.NEXTAUTH_URL)[1];
-  
+
   const dict = getDictionary(lang);
 
   return (
     <div className="relative min-h-96 bg-white dark:bg-neutral-900 text-center flex flex-col justify-center items-center gap-28">
-      <section className="py-16 text-center mt-12">
+      <section className="py-16 text-center mt-12 mx-4">
         <h1 className="text-4xl font-bold">Discover Every Side of the Story</h1>
         <p className="mt-4 text-lg text-gray-600 dark:text-neutral-200 max-w-2xl mx-auto">
           Alternipedia is a collaborative encyclopedia showing how the same topic is explained from different political, cultural, and ideological perspectives.
@@ -40,7 +40,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         </div>
       </section>
 
-      <section className="py-12 bg-gray-50 dark:bg-neutral-800 px-12 rounded-lg">
+      <section className="py-12 bg-gray-50 dark:bg-neutral-800 px-4 md:px-12 rounded-lg">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-2xl font-semibold mb-4 dark:text-neutral-200">What is Alternipedia?</h2>
           <p className="text-gray-700 dark:text-neutral-300 leading-relaxed">
@@ -53,7 +53,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
 
 
       <section className="py-12">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+        <div className="max-w-5xl mx-4 md:mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           <div>
             <h3 className="font-semibold text-xl mb-2">1. Choose a Topic</h3>
             <p className="text-gray-600 dark:text-neutral-300">Search or browse thousands of articles written from multiple perspectives.</p>

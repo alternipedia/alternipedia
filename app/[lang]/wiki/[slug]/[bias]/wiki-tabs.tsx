@@ -387,9 +387,8 @@ export default function WikiTabs({ bias, slug, lang, revision = null, wikipediaD
                       onLoad={() => setLoaded(true)}
                       id="wikiFrame"
                       src={`/api/wiki-proxy?slug=${slug}&lang=${lang}`}
-                      className="block relative left-1/2 -translate-x-1/2"
+                      className={`block relative left-1/2 -translate-x-1/2 ${isMobile ? 'w-[calc(100%+2rem)] -ml-4' : 'w-full'}`}
                       style={{
-                        width: isMobile ? 'calc(100% + 2rem)' : '100%', // expands 1rem (16px) on both sides
                         height,
                         border: 'none',
                         overflow: 'hidden',
