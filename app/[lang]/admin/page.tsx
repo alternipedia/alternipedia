@@ -42,7 +42,7 @@ export default async function AdminPage({
   }
 
   return (
-    <div className="mx-2 md:mx-auto md:container! py-8 space-y-8">
+    <div className="mx-2 md:mx-auto md:container! py-8 space-y-8 px-4">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Moderation Dashboard</h1>

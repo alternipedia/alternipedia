@@ -35,6 +35,5 @@ export default function ThemeToggle({ className }: { className?: string }) {
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
-
   );
 }
