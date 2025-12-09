@@ -478,6 +478,7 @@ export default function Article({
     params.delete('bias');
     params.delete('mode');
     params.delete('revision');
+    params.delete('content');
 
     const newPath = `${pathnameOnly}?${params.toString()}`;
 

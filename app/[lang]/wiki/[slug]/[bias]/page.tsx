@@ -88,6 +88,7 @@ export default async function Page({
     };
 
     try {
+      console.log(slug);
       const rawData = await fetchWikipediaPageWithWtf(slug, lang);
 
       if (rawData) {
