@@ -509,7 +509,7 @@ export default function Article({
   return (
     <div className="relative bg-white dark:bg-neutral-900 min-h-screen overflow-x-hidden">
       {/* HEADER - ToggleGroup shown first on mobile, positioned in center on desktop */}
-      <div className="lg:mx-64 xl:mx-64 2xl:mx-96 px-4 pt-2 overflow-x-hidden sm:-mb-4 md:-mb-4 lg:relative lg:z-10">
+      <div className="lg:mx-64 xl:mx-64 2xl:mx-96 px-4 pt-6 overflow-x-hidden sm:-mb-4 md:-mb-4 lg:relative lg:z-10">
         <div className="flex items-center justify-between pb-1">
           <span className="text-xl pl-2">{dict.bias.title}</span>
           <span className="text-md pr-2 pointer-default cursor-context-menu">
