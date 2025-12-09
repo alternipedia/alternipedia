@@ -132,23 +132,31 @@ window.parent.postMessage({ type: 'iframe-ready' }, '*');
   $('head').append(`
   <script>
     function sendHeight() {
-      const body = document.getElementById("bodyContent") || document.body;
+      const body = document.getElementById("bodyContentWrapper") || document.body;
       if (!body) return; // fail-safe
       const height = body.scrollHeight;
       window.parent.postMessage({ type: "wiki-height", height }, "*");
     }
 
     function setupObserver() {
-      const body = document.getElementById("bodyContent") || document.body;
+      const body = document.getElementById("bodyContentWrapper") || document.body;
       if (!body) return;
 
       sendHeight(); // initial height
 
-      const observer = new MutationObserver(sendHeight);
-      observer.observe(body, { childList: true, subtree: true });
+      // ResizeObserver is better for detecting layout changes (like expanding/collapsing details)
+      const observer = new ResizeObserver(sendHeight);
+      observer.observe(body);
+      
+      // Also listen to image loads which might change height
+      window.addEventListener('load', sendHeight);
     }
 
-    window.addEventListener("load", setupObserver);
+    if (document.readyState === 'loading') {
+      window.addEventListener("DOMContentLoaded", setupObserver);
+    } else {
+      setupObserver();
+    }
   </script>
   <style>
     

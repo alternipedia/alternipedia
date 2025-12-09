@@ -1,4 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
+import type { Viewport } from "next";
 import SwRegister from "@/app/components/pwa/SwRegister";
 import CookieBanner from "@/app/(client-renders)/cookie-banner";
 import { Providers } from "@/app/(client-renders)/providers";
@@ -16,6 +17,13 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#171717' },
+  ],
+}
 
 export default async function RootLayout({
   children,
@@ -41,7 +49,6 @@ export default async function RootLayout({
     <html className={htmlClass}>
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#ffffff" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="google-adsense-account" content="ca-pub-7936619142942349" />
