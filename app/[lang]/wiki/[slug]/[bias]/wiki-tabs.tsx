@@ -176,8 +176,8 @@ export default function WikiTabs({ bias, slug, lang, revision = null, wikipediaD
     const sendThemeToIframe = (iframe: HTMLIFrameElement | null) => {
       if (!iframe) return;
       try {
-        // Read theme cookie named 'theme'. If absent default to 'light'.
-        const m = document.cookie.match(/(?:^|; )theme=([^;]+)/);
+        // Read theme cookie named 'alternipedia-theme'. If absent default to 'light'.
+        const m = document.cookie.match(/(?:^|; )alternipedia-theme=([^;]+)/);
         const theme = m ? decodeURIComponent(m[1]) : 'light';
         const origin = window.location.origin;
         iframe.contentWindow?.postMessage({ type: 'theme', theme }, origin);
@@ -206,7 +206,20 @@ export default function WikiTabs({ bias, slug, lang, revision = null, wikipediaD
     // Also send theme once on mount in case the iframe is already ready/loaded
     sendThemeToIframe(iframeRef.current);
 
-    return () => window.removeEventListener("message", handleMessage);
+    // Watch for theme changes on the html element (class attribute)
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+          sendThemeToIframe(iframeRef.current);
+        }
+      });
+    });
+    observer.observe(document.documentElement, { attributes: true });
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+      observer.disconnect();
+    };
   }, [isWikipedia, slug, lang]);
 
   // When iframe load state changes to loaded, push theme as a fallback
@@ -215,7 +228,7 @@ export default function WikiTabs({ bias, slug, lang, revision = null, wikipediaD
     if (!loaded) return;
     try {
       const iframe = iframeRef.current;
-      const m = document.cookie.match(/(?:^|; )theme=([^;]+)/);
+      const m = document.cookie.match(/(?:^|; )alternipedia-theme=([^;]+)/);
       const theme = m ? decodeURIComponent(m[1]) : 'light';
       const origin = window.location.origin;
       iframe.contentWindow?.postMessage({ type: 'theme', theme }, origin);
