@@ -296,7 +296,6 @@ export default function BottomTools() {
       {isMenuOpen && (
         <div
           ref={menuRef}
-          // className="fixed bottom-18 right-8 bg-gray-800 rounded-lg shadow-xl p-2 z-20 min-w-48 animate-in fade-in slide-in-from-bottom-2 duration-200 block lg:hidden w-[calc(100vw-4rem)] shadow-md"
           className="fixed right-8 bg-gray-800 rounded-lg p-2 z-50 min-w-48 animate-in fade-in slide-in-from-bottom-2 duration-200 block lg:hidden w-[calc(100vw-4rem)] shadow-md transform-gpu will-change-transform bottom-[calc(env(safe-area-inset-bottom,0px)+68px)]"
         >
           <div className="flex flex-col gap-1">

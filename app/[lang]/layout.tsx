@@ -271,8 +271,8 @@ export default async function Layout({
                     </DialogContent>
                   </Dialog>
                 )}
-                <Link href="/" className="text-blue-400 text-sm font-normal leading-normal hover:underline inline-block w-fit active:underline">{dict.footer.disclaimers}</Link>
-                <Link href="/" className="text-blue-400 text-sm font-normal leading-normal hover:underline inline-block w-fit active:underline">{dict.footer.codeOfConduct}</Link>
+                <Link href={`/${lang}/disclaimers`} className="text-blue-400 text-sm font-normal leading-normal hover:underline inline-block w-fit active:underline">{dict.footer.disclaimers}</Link>
+                <Link href={`/${lang}/code-of-conduct`} className="text-blue-400 text-sm font-normal leading-normal hover:underline inline-block w-fit active:underline">{dict.footer.codeOfConduct}</Link>
               </div>
 
               {/* Second Links Column */}

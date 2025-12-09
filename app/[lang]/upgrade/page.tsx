@@ -66,7 +66,7 @@ export default async function Pricing({ params }: { params: Promise<{ lang: stri
         <div
           className="flex flex-col rounded-[10px] border-2 border-transparent relative overflow-hidden"
           style={{
-            background: "linear-gradient(var(--background), var(--background)) padding-box, linear-gradient(180deg, rgba(238,205,27,1) 0%, rgba(32,33,34,1) 100%) border-box"
+            background: "linear-gradient(var(--card), var(--card)) padding-box, linear-gradient(180deg, rgba(238,205,27,1) 0%, rgba(32,33,34,1) 100%) border-box"
           }}
         >
           <div className="bg-[#eecd1b] py-2 px-4 relative z-10">
