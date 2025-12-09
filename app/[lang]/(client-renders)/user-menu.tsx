@@ -102,7 +102,7 @@ export default function UserMenu({ lang }: { lang: Locale }) {
                 <BookMarked size={16} className="opacity-60" aria-hidden="true" />
                 <span>{dict.userMenu.savedArticles}</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700">
+              <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700" onClick={() => router.push(`/${lang}/contributions`)}>
                 <MessageSquarePlus size={16} className="opacity-60" aria-hidden="true" />
                 <span>{dict.userMenu.contributions}</span>
               </DropdownMenuItem>
@@ -111,7 +111,7 @@ export default function UserMenu({ lang }: { lang: Locale }) {
                 <span>{dict.userMenu.preferences}</span>
               </DropdownMenuItem>
               {session.user.moderatedBias?.id && (
-                <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700" onClick={() => router.push(`/${lang}/settings`)}>
+                <DropdownMenuItem className="cursor-pointer dark:hover:bg-neutral-700" onClick={() => router.push(`/${lang}/admin`)}>
                   <Gavel size={16} className="opacity-60" aria-hidden="true" />
                   <span>Moderator panel</span>
                 </DropdownMenuItem>

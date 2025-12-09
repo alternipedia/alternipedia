@@ -1,11 +1,10 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "./generated"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
 }
 
 // =======================
@@ -23,46 +22,46 @@ enum SubscriptionTier {
 }
 
 model User {
-  id              String            @id @default(cuid())
-  name            String?           @db.VarChar(300)
-  slug            String?           @unique @db.VarChar(100)
-  email           String?           @unique
-  emailVerified   DateTime?
-  image           String?
-  accounts        Account[]
-  sessions        Session[]
+  id            String    @id @default(cuid())
+  name          String?   @db.VarChar(300)
+  slug          String?   @unique @db.VarChar(100)
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
 
   // user roles
-  role            UserRole          @default(USER)
-  adminOfLang     Language?
-  moderatedBias   ModeratorBias? @relation("ModeratorBiasUser") // Bias this user moderates (one bias)
+  role                  UserRole        @default(USER)
+  adminOfLang           Language?
+  moderatedBias         ModeratorBias?  @relation("ModeratorBiasUser") // Bias this user moderates (one bias)
   assignedModeratorBias ModeratorBias[] @relation("ModeratorBiasAssignedByAdmin") // Biases this user assigned as moderator
 
   // articles
-  threadsAuthored Thread[] 
-  threadComments      ThreadComment[]
-  threadCommentLikes  ThreadCommentLikes[]
-  blocks          Block[]
-  addedCategories ArticleCategory[] // categories this user added
-  watching        ArticleWatcher[]  // articles this user watches
-  savedArticles   SavedArticle[] // articles this user saved
+  threadsAuthored    Thread[]
+  threadComments     ThreadComment[]
+  threadCommentLikes ThreadCommentLikes[]
+  blocks             Block[]
+  addedCategories    ArticleCategory[] // categories this user added
+  watching           ArticleWatcher[] // articles this user watches
+  savedArticles      SavedArticle[] // articles this user saved
 
   // wiki interactions
-  biasBans        Ban[]   @relation("BansReceived")      // 🚫 bans received
-  issuedBans      Ban[]         @relation("BansIssued") // 🧑‍⚖️ bans given (mods)
-  votes           RevisionVote[]
-  notes           Note[]
-  uploadedBlobs   Blob[]
-  feedbacks       Feedback[]
-  reportsSent     Reports[]
-  viewed          PageView[]
+  biasBans      Ban[]          @relation("BansReceived") // 🚫 bans received
+  issuedBans    Ban[]          @relation("BansIssued") // 🧑‍⚖️ bans given (mods)
+  votes         RevisionVote[]
+  notes         Note[]
+  uploadedBlobs Blob[]
+  feedbacks     Feedback[]
+  reportsSent   Reports[]
+  viewed        PageView[]
 
   // wiki settings
-  currentEditableBias   Bias?    @relation(fields: [currentEditableBiasId], references: [id])
-  currentEditableBiasId Int?
+  currentEditableBias          Bias?     @relation(fields: [currentEditableBiasId], references: [id])
+  currentEditableBiasId        Int?
   currentEditableBiasChangedAt DateTime?
-  emailNotifications    Boolean          @default(true)
-  pushNotifications     Boolean          @default(true)
+  emailNotifications           Boolean   @default(true)
+  pushNotifications            Boolean   @default(true)
 
   // subscriptions
   subscriptionTier      SubscriptionTier @default(FREE)
@@ -71,45 +70,45 @@ model User {
   subscriptionExpiresAt DateTime?
   stripeCustomerId      String?
 
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ModeratorBias {
-  id        Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  user      User     @relation("ModeratorBiasUser", fields: [userId], references: [id])
-  userId    String  @unique
+  user   User   @relation("ModeratorBiasUser", fields: [userId], references: [id])
+  userId String @unique
 
-  bias      Bias     @relation(fields: [biasId], references: [id])
-  biasId    Int
-  
-  language  Language
+  bias   Bias @relation(fields: [biasId], references: [id])
+  biasId Int
 
-  assignedBy User   @relation("ModeratorBiasAssignedByAdmin", fields: [assignedByAdminId], references: [id])
+  language Language
+
+  assignedBy        User   @relation("ModeratorBiasAssignedByAdmin", fields: [assignedByAdminId], references: [id])
   assignedByAdminId String
 
-  revisionLawViolations Revision[] @relation("ReportedRevisionLawViolations")
-  blobLawViolations Blob[] @relation("UploadedBlobLawViolation")
-  threadLawViolations Thread[] @relation("ThreadLawViolation")
+  revisionLawViolations      Revision[]      @relation("ReportedRevisionLawViolations")
+  blobLawViolations          Blob[]          @relation("UploadedBlobLawViolation")
+  threadLawViolations        Thread[]        @relation("ThreadLawViolation")
   threadCommentLawViolations ThreadComment[] @relation("ThreadCommentLawViolation")
 
   assignedAt DateTime @default(now())
 }
 
 model Subscription {
-  id           String   @id @default(cuid())
-  user         User     @relation(fields: [userId], references: [id])
-  userId       String
+  id     String @id @default(cuid())
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
-  stripeSubId  String   @unique
-  plan         SubscriptionTier
+  stripeSubId String           @unique
+  plan        SubscriptionTier
 
-  status       String
+  status           String
   currentPeriodEnd DateTime
-  
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Account {
@@ -125,8 +124,8 @@ model Account {
   id_token          String? @db.Text
   session_state     String?
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId            String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
 
   @@unique([provider, providerAccountId])
 }
@@ -145,8 +144,8 @@ model Session {
 // Core Wiki Models
 // =======================
 model Bias {
-  id              Int        @id @default(autoincrement())
-  name            String     @unique
+  id              Int               @id @default(autoincrement())
+  name            String            @unique
   revisions       Revision[]
   bans            Ban[]
   moderators      ModeratorBias[]
@@ -159,74 +158,74 @@ model Bias {
 
 // TODO: Warning strikes?
 model Ban {
-  id           Int       @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  user         User      @relation("BansReceived", fields: [userEmail], references: [email])
-  userEmail    String 
+  user      User   @relation("BansReceived", fields: [userEmail], references: [email])
+  userEmail String
 
-  bias         Bias      @relation(fields: [biasId], references: [id])
-  biasId       Int
+  bias   Bias @relation(fields: [biasId], references: [id])
+  biasId Int
 
-  bannedBy     User     @relation("BansIssued", fields: [bannedByUserId], references: [id])
+  bannedBy       User   @relation("BansIssued", fields: [bannedByUserId], references: [id])
   bannedByUserId String
 
-  reason       String  @db.VarChar(2000)
-  
-  createdAt    DateTime  @default(now())
-  expiresAt    DateTime?
+  reason String @db.VarChar(2000)
+
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
 
   @@unique([userEmail, biasId]) // prevent duplicate bans per bias
 }
 
 model Feedback {
-  id        Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  user      User   @relation(fields: [userId], references: [id])
-  userId    String
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
-  language  Language
+  language Language
 
-  content   String @db.VarChar(2000)
+  content   String   @db.VarChar(2000)
   createdAt DateTime @default(now())
 }
 
 model Article {
-  id          Int               @id @default(autoincrement())
-  title       String
-  slug        String
-  language    Language
+  id       Int      @id @default(autoincrement())
+  title    String
+  slug     String
+  language Language
 
-  revisions   Revision[]
-  categories  ArticleCategory[] // explicit join model with metadata
-  watchers    ArticleWatcher[]   // who’s watching this article
-  savedBy     SavedArticle[] // who's saved this article
-  threads     Thread[] // threads related to this article
-  views       PageView[]
-  
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-  
+  revisions  Revision[]
+  categories ArticleCategory[] // explicit join model with metadata
+  watchers   ArticleWatcher[] // who’s watching this article
+  savedBy    SavedArticle[] // who's saved this article
+  threads    Thread[] // threads related to this article
+  views      PageView[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([slug, language])
 }
 
 model PageView {
-  id          Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  article     Article?  @relation(fields: [articleId], references: [id])
-  articleId   Int?
-  revision    Revision?  @relation(fields: [revisionId], references: [id])
-  revisionId  Int?
-  bias        Bias?     @relation(fields: [biasId], references: [id])
-  biasId      Int?
-  uri         String   @db.VarChar(2000)
+  article    Article?  @relation(fields: [articleId], references: [id])
+  articleId  Int?
+  revision   Revision? @relation(fields: [revisionId], references: [id])
+  revisionId Int?
+  bias       Bias?     @relation(fields: [biasId], references: [id])
+  biasId     Int?
+  uri        String    @db.VarChar(2000)
 
-  viewer        User?     @relation(fields: [viewerId], references: [id])
-  viewerId      String?
-  language      Language?
+  viewer   User?     @relation(fields: [viewerId], references: [id])
+  viewerId String?
+  language Language?
 
-  ipAddress     String? // store hashed IP for privacy
-  userAgent     String? // store user agent string
-  createdAt     DateTime @default(now())
+  ipAddress String? // store hashed IP for privacy
+  userAgent String? // store user agent string
+  createdAt DateTime @default(now())
 }
 
 enum ThreadStatus {
@@ -237,30 +236,30 @@ enum ThreadStatus {
 }
 
 model Thread {
-  id        Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  article   Article  @relation(fields: [articleId], references: [id])
+  article   Article @relation(fields: [articleId], references: [id])
   articleId Int
 
-  bias      Bias     @relation(fields: [biasId], references: [id])
-  biasId    Int
+  bias   Bias @relation(fields: [biasId], references: [id])
+  biasId Int
 
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId   String
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String
 
-  referencesRevision Revision? @relation("ReferenceRevisionThreads", fields: [referencesRevisionId], references: [id])
+  referencesRevision   Revision? @relation("ReferenceRevisionThreads", fields: [referencesRevisionId], references: [id])
   referencesRevisionId Int?
 
-  violatesLaw Boolean  @default(false)
-  violationSetBy ModeratorBias? @relation("ThreadLawViolation", fields: [violationSetByUserId], references: [id])
+  violatesLaw          Boolean        @default(false)
+  violationSetBy       ModeratorBias? @relation("ThreadLawViolation", fields: [violationSetByUserId], references: [id])
   violationSetByUserId Int?
 
-  status   ThreadStatus @default(OPEN)
-  comments  ThreadComment[]      @relation("ThreadComments")
-  reports Reports[]
-  title   String   @db.VarChar(300)
-  content    String   @db.VarChar(2000)
-  language   Language
+  status   ThreadStatus    @default(OPEN)
+  comments ThreadComment[] @relation("ThreadComments")
+  reports  Reports[]
+  title    String          @db.VarChar(300)
+  content  String          @db.VarChar(2000)
+  language Language
 
   createdAt DateTime @default(now())
 }
@@ -272,27 +271,27 @@ enum ReportStatus {
 }
 
 model Reports {
-  id         Int       @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  reportedBy      User      @relation(fields: [reportedById], references: [id])
-  reportedById    String
+  reportedBy   User   @relation(fields: [reportedById], references: [id])
+  reportedById String
 
-  status    ReportStatus
-  reason    String    @db.VarChar(2000)
+  status ReportStatus
+  reason String       @db.VarChar(2000)
 
-  thread    Thread? @relation(fields: [threadId], references: [id])
-  threadId  Int?
+  thread   Thread? @relation(fields: [threadId], references: [id])
+  threadId Int?
 
   comment   ThreadComment? @relation(fields: [commentId], references: [id])
   commentId Int?
 
-  revision  Revision?      @relation(fields: [revisionId], references: [id])
+  revision   Revision? @relation(fields: [revisionId], references: [id])
   revisionId Int?
 
-  blob      Blob? @relation(fields: [blobId], references: [id])
-  blobId    Int?
+  blob   Blob? @relation(fields: [blobId], references: [id])
+  blobId Int?
 
-  createdAt DateTime  @default(now())
+  createdAt DateTime @default(now())
 
   @@unique([reportedById, threadId])
   @@unique([reportedById, commentId])
@@ -301,79 +300,79 @@ model Reports {
 }
 
 model ThreadComment {
-  id         Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  thread     Thread @relation("ThreadComments", fields: [threadId], references: [id])
-  threadId   Int
+  thread   Thread @relation("ThreadComments", fields: [threadId], references: [id])
+  threadId Int
 
-  author     User     @relation(fields: [authorId], references: [id])
-  authorId   String
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String
 
-  likes      ThreadCommentLikes[]
-  content    String   @db.VarChar(2000)
+  likes   ThreadCommentLikes[]
+  content String               @db.VarChar(2000)
 
-  violatesLaw Boolean  @default(false)
-  violationSetBy ModeratorBias? @relation("ThreadCommentLawViolation", fields: [violationSetByUserId], references: [id])
+  violatesLaw          Boolean        @default(false)
+  violationSetBy       ModeratorBias? @relation("ThreadCommentLawViolation", fields: [violationSetByUserId], references: [id])
   violationSetByUserId Int?
-  reports   Reports[]
+  reports              Reports[]
 
-  createdAt  DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model ThreadCommentLikes {
-  id         Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  comment    ThreadComment @relation(fields: [commentId], references: [id])
-  commentId  Int
+  comment   ThreadComment @relation(fields: [commentId], references: [id])
+  commentId Int
 
-  user       User     @relation(fields: [userId], references: [id])
-  userId     String
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
-  createdAt  DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@unique([commentId, userId]) // each user can like a comment once
 }
 
 model Revision {
-  id              Int      @id @default(autoincrement())
-  article         Article  @relation(fields: [articleId], references: [id])
-  articleId       Int
+  id        Int     @id @default(autoincrement())
+  article   Article @relation(fields: [articleId], references: [id])
+  articleId Int
 
-  bias            Bias     @relation(fields: [biasId], references: [id])
-  biasId          Int
+  bias   Bias @relation(fields: [biasId], references: [id])
+  biasId Int
 
-  violatesLaw     Boolean  @default(false)
+  violatesLaw Boolean @default(false)
 
-  violatesLawSetBy ModeratorBias? @relation("ReportedRevisionLawViolations", fields: [violatesLawSetByUserId], references: [id])
+  violatesLawSetBy       ModeratorBias? @relation("ReportedRevisionLawViolations", fields: [violatesLawSetByUserId], references: [id])
   violatesLawSetByUserId Int?
 
-  revisionBlocks  RevisionBlock[] 
-  votes           RevisionVote[]
-  threadsReferencing Thread[] @relation("ReferenceRevisionThreads")
-  reports Reports[]
-  views          PageView[]
+  revisionBlocks     RevisionBlock[]
+  votes              RevisionVote[]
+  threadsReferencing Thread[]        @relation("ReferenceRevisionThreads")
+  reports            Reports[]
+  views              PageView[]
 
-  createdAt       DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model Block {
-  id       Int      @id @default(autoincrement())
-  author   User    @relation(fields: [authorId], references: [id])
+  id       Int    @id @default(autoincrement())
+  author   User   @relation(fields: [authorId], references: [id])
   authorId String
 
-  type     BlockType
-  content  Json
+  type    BlockType
+  content Json
 
   revisionBlocks RevisionBlock[]
 }
 
 model Note {
-  id       Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  author   User    @relation(fields: [authorId], references: [id])
+  author   User   @relation(fields: [authorId], references: [id])
   authorId String
 
-  content  Json
+  content Json
 }
 
 model RevisionBlock {
@@ -383,39 +382,39 @@ model RevisionBlock {
   block      Block    @relation(fields: [blockId], references: [id])
   blockId    Int
 
-  order      Int      
+  order Int
 }
 
 model RevisionVote {
-  id         Int       @id @default(autoincrement())
-  revision   Revision  @relation(fields: [revisionId], references: [id])
+  id         Int      @id @default(autoincrement())
+  revision   Revision @relation(fields: [revisionId], references: [id])
   revisionId Int
 
-  user       User      @relation(fields: [userId], references: [id])
-  userId     String
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
-  value      Int       @default(1) // 1 star, could extend to multi-star rating
-  createdAt  DateTime  @default(now())
+  value     Int      @default(1) // 1 star, could extend to multi-star rating
+  createdAt DateTime @default(now())
 
   @@unique([revisionId, userId]) // each user can vote once per revision
 }
 
 model Blob {
-  id        Int      @id @default(autoincrement())
-  url       String   @unique
+  id  Int    @id @default(autoincrement())
+  url String @unique
 
-  bias      Bias      @relation(fields: [biasId], references: [id])
-  biasId    Int
+  bias   Bias @relation(fields: [biasId], references: [id])
+  biasId Int
 
-  tier     SubscriptionTier @default(FREE)
+  tier SubscriptionTier @default(FREE)
 
-  uploadedBy User    @relation(fields: [uploadedByUserId], references: [id])
+  uploadedBy       User   @relation(fields: [uploadedByUserId], references: [id])
   uploadedByUserId String
 
-  violatesLaw Boolean  @default(false)
-  violatesLawSetBy ModeratorBias? @relation("UploadedBlobLawViolation", fields: [violatesLawSetByUserId], references: [id])
+  violatesLaw            Boolean        @default(false)
+  violatesLawSetBy       ModeratorBias? @relation("UploadedBlobLawViolation", fields: [violatesLawSetByUserId], references: [id])
   violatesLawSetByUserId Int?
-  reports Reports[]
+  reports                Reports[]
 
   uploadedAt DateTime @default(now())
 }
@@ -488,57 +487,56 @@ enum Language {
 }
 
 model ArticleWatcher {
-  id        String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  article     Article @relation(fields: [articleId], references: [id])
-  articleId   Int
+  article   Article @relation(fields: [articleId], references: [id])
+  articleId Int
 
-  user        User    @relation(fields: [userId], references: [id])
-  userId      String
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
-  watchedAt   DateTime @default(now())
+  watchedAt DateTime @default(now())
 
   @@unique([articleId, userId])
 }
 
 model SavedArticle {
-  id        String   @id @default(cuid())
+  id String @id @default(cuid())
 
   article   Article @relation(fields: [articleId], references: [id])
   articleId Int
 
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
-  savedAt   DateTime @default(now())
+  savedAt DateTime @default(now())
 
   @@unique([articleId, userId])
 }
 
 model ArticleCategory {
-  article       Article @relation(fields: [articleId], references: [id])
-  articleId     Int
+  article   Article @relation(fields: [articleId], references: [id])
+  articleId Int
 
-  category      Category @relation(fields: [categoryId], references: [id])
-  categoryId    Int
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId Int
 
-  biasId        Int
-  bias          Bias  @relation(fields: [biasId], references: [id])
+  biasId Int
+  bias   Bias @relation(fields: [biasId], references: [id])
 
-  addedBy       User     @relation(fields: [addedByUserId], references: [id])
+  addedBy       User   @relation(fields: [addedByUserId], references: [id])
   addedByUserId String
 
-  addedAt       DateTime @default(now())
+  addedAt DateTime @default(now())
 
   @@id([articleId, categoryId, biasId]) // composite primary key includes bias so categories can vary per-bias
 }
 
 model Category {
-  id        Int               @id @default(autoincrement())
-  name      String
-  articles  ArticleCategory[]
-  language  Language
+  id       Int               @id @default(autoincrement())
+  name     String
+  articles ArticleCategory[]
+  language Language
 
   @@unique([name, language])
 }
-
