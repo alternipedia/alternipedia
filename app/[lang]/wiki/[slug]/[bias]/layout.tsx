@@ -642,7 +642,7 @@ export default function Article({
                   <div className="self-stretch flex flex-col justify-start items-start gap-1.5">
                     <LanguageSwitcher currentLang={currentLang} mobile={false} />
 
-                    <div data-property-1="Default" className="self-stretch p-1.5 rounded-md inline-flex justify-between items-center">
+                    {/* <div data-property-1="Default" className="self-stretch p-1.5 rounded-md inline-flex justify-between items-center">
                       <a href="#" className="hover:underline">
                         <div className="size- flex justify-start items-center gap-1.5">
                           <div data-svg-wrapper data-property-1="Speech" className="relative">
@@ -653,7 +653,7 @@ export default function Article({
                           </div>
                         </div>
                       </a>
-                    </div>
+                    </div> */}
 
                     {/* <div data-property-1="Default" className="self-stretch p-1.5 rounded-md inline-flex justify-between items-center">
                       <a className="hover:underline cursor-not-allowed">
@@ -767,7 +767,8 @@ export default function Article({
                     <div data-property-1="Default" className="self-stretch p-1.5 rounded-md inline-flex justify-start items-center gap-1.5">
                       <ShortURL mobile={false} />
                     </div>
-                    <div data-property-1="Default" className="self-stretch p-1.5 rounded-md inline-flex justify-start items-center gap-1.5">
+
+                    {/* <div data-property-1="Default" className="self-stretch p-1.5 rounded-md inline-flex justify-start items-center gap-1.5">
                       <a href="" className="hover:underline">
                         <div className="size- flex justify-start items-center gap-1.5">
                           <div data-svg-wrapper data-property-1="Cite" className="relative">
@@ -778,7 +779,8 @@ export default function Article({
                           </div>
                         </div>
                       </a>
-                    </div>
+                    </div> */}
+
                     <div data-property-1="Default" className="self-stretch p-1.5 rounded-md inline-flex justify-start items-center gap-1.5">
                       <Dialog>
                         <DialogTrigger asChild>
@@ -816,7 +818,8 @@ export default function Article({
                         </div>
                       </button>
                     </div>
-                    <div data-property-1="Default" className="self-stretch p-1.5 rounded-md inline-flex justify-start items-center gap-1.5">
+
+                    {/* <div data-property-1="Default" className="self-stretch p-1.5 rounded-md inline-flex justify-start items-center gap-1.5">
                       <a href="#" className="hover:underline">
                         <div className="size- flex justify-start items-center gap-1.5">
                           <div data-svg-wrapper data-property-1="Info" className="relative">
@@ -827,7 +830,8 @@ export default function Article({
                           </div>
                         </div>
                       </a>
-                    </div>
+                    </div>*/}
+
                   </div>
                 </CollapsibleContent>
               </div>
