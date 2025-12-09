@@ -22,6 +22,7 @@ import { debounce } from "@/lib/utils";
 import { useId } from "react";
 import { Tag, TagInput } from "emblor";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 
 const emptyDoc = {
   type: "doc", content: [
@@ -270,7 +271,9 @@ export default function ContentEditorComponent({ slug, lang, bias, revision }: {
       // Only reload the page when the save actually succeeded. Don't rely on React state here because
       // setEditorError is asynchronous and its value may not be updated yet when finally runs.
       if (saveSucceeded) {
-        window.location.reload();
+        const url = new URL(window.location.href);
+        url.searchParams.delete("mode");
+        window.location.href = url.toString();
       }
     }
   };
