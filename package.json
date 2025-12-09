@@ -54,7 +54,7 @@
     "@tiptap/extension-table": "^3.7.1",
     "@tiptap/extension-text-align": "^3.7.0",
     "@tiptap/extension-typography": "^3.7.0",
-    "@tiptap/extensions": "^3.7.0",
+    "@tiptap/extensions": "^3.13.0",
     "@tiptap/html": "^3.7.1",
     "@tiptap/pm": "^3.7.0",
     "@tiptap/react": "^3.7.0",
