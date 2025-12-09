@@ -132,23 +132,26 @@ window.parent.postMessage({ type: 'iframe-ready' }, '*');
   $('head').append(`
   <script>
     function sendHeight() {
-      // Use the wrapper or fallback to body/documentElement
+      // Strictly use the wrapper if it exists, as it represents the true content height.
+      // Fallback to body ONLY if wrapper is missing (which shouldn't happen).
+      // body.scrollHeight often matches the viewport (iframe) height, preventing shrinking.
       const wrapper = document.getElementById("bodyContentWrapper");
-      const body = document.body;
-      const html = document.documentElement;
       
-      if (!wrapper && !body) return;
+      let height = 0;
+      if (wrapper) {
+        height = wrapper.offsetHeight; 
+        // offsetHeight includes padding/borders, which is usually what we want.
+        // If content overflows, scrollHeight might be larger, but with flow-root/overflow-hidden it should match.
+        if (wrapper.scrollHeight > height) {
+           height = wrapper.scrollHeight;
+        }
+      } else if (document.body) {
+         height = document.body.scrollHeight;
+      }
+      
+      // Ensure we never send 0 if there is content
+      if (height === 0 && document.body) height = document.body.scrollHeight;
 
-      // Calculate the maximum possible height to ensure we don't cut off content
-      const height = Math.max(
-        wrapper ? wrapper.scrollHeight : 0,
-        wrapper ? wrapper.offsetHeight : 0,
-        body ? body.scrollHeight : 0,
-        body ? body.offsetHeight : 0,
-        html ? html.scrollHeight : 0,
-        html ? html.offsetHeight : 0
-      );
-      
       window.parent.postMessage({ type: "wiki-height", height }, "*");
     }
 
@@ -174,7 +177,6 @@ window.parent.postMessage({ type: 'iframe-ready' }, '*');
       const resizeObserver = new ResizeObserver(scheduleSendHeight);
       if (wrapper) resizeObserver.observe(wrapper);
       if (body) resizeObserver.observe(body);
-      if (html) resizeObserver.observe(html);
 
       // Watch for DOM structure changes
       const mutationObserver = new MutationObserver(scheduleSendHeight);
@@ -201,7 +203,13 @@ window.parent.postMessage({ type: 'iframe-ready' }, '*');
     }
   </script>
   <style>
-    
+    /* Ensure the wrapper captures all content (floats, margins) */
+    #bodyContentWrapper {
+      display: flow-root; 
+      width: 100%;
+      height: auto;
+      overflow: hidden; /* Prevent margin collapse and horizontal scroll */
+    }
   </style>
   `);
 
