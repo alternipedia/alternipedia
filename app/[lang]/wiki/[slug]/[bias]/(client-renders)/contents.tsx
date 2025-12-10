@@ -77,7 +77,7 @@ function HeadingItem({ heading, active, index, containerRef }: { heading: Headin
         onClick={handleClick}
         // TODO: highlight active section
         className={`text-left text-sm text-gray-700 dark:text-neutral-400  hover:text-blue-600 hover:underline cursor-pointer text-ellipsis ${active ? 'font-semibold' : ''}`}
-        // className={`text-left text-sm text-gray-700 hover:text-blue-600 hover:underline cursor-pointer text-ellipsis ${active ? '' : ''}`}
+      // className={`text-left text-sm text-gray-700 hover:text-blue-600 hover:underline cursor-pointer text-ellipsis ${active ? '' : ''}`}
       >
         {heading.title}
       </button>
@@ -133,8 +133,8 @@ export default function Contents({ headings = [] }: ContentsProps) {
   if (headings.length === 0) {
     return (
       <div className="flex h-full flex-col gap-2">
-        <div className="text-sm text-gray-500 italic">
-          Table of contents will appear here when viewing an article.
+        <div className="text-sm text-neutral-500 italic">
+          Table of contents will appear here when available.
         </div>
       </div>
     );
